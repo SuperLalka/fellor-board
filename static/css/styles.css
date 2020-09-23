@@ -1,0 +1,225 @@
+@import url(//fonts.googleapis.com/css2?family=Pacifico&display=swap);
+
+
+p, h2 {
+    margin: 0;
+}
+a {
+    color: black;
+    text-decoration: none;
+}
+
+body {
+    margin: 0;
+}
+
+.popup {
+    background-color: rgba(0, 0, 0, .5);
+    height: 100vh;
+    left: 0;
+    position: absolute;
+    top: 0;
+    visibility: visible;
+    width: 100vw;
+}
+
+.popup__title {
+    background-color: lavender;
+    border-radius: 10px 10px 0 0;
+    display: block;
+    font-size: 30px;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.popup__divider {
+    margin: 0;
+}
+
+.popup__customization {
+    background-color: white;
+    border-radius: 10px;
+    margin: 100px auto 0;
+    min-height: 300px;
+    width: 600px;
+}
+
+.customization-form {
+    padding: 20px;
+}
+
+.customization-form__block {
+    font-size: 20px;
+}
+
+.customization-form__label {
+    display: block;
+}
+
+.customization-form__input {
+    border: 1px solid;
+    border-radius: 10px;
+    height: 30px;
+    margin: 10px 0;
+    outline: none;
+    padding: 0 15px;
+    width: 95%;
+}
+
+.customization-form__button {
+    background-color: gold;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 18px;
+    height: 40px;
+    margin: 20px 0 0;
+    outline: none;
+    width: 100%;
+}
+
+.customization-form__button:hover {
+    background-color: palegoldenrod;
+}
+
+.header {
+    align-items: center;
+    background: black;
+    display: flex;
+    height: 40px;
+    min-width: 100%;
+}
+
+.header__home-page {
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    width: 100px;
+}
+
+.header__home-page::before {
+    color: white;
+    content: '\2630';
+    font-size: 24px;
+    padding: 0 5px;
+}
+
+.header__search-input {
+    height: 25px;
+    margin: 0 20px;
+}
+
+.header__title {
+    color: white;
+    font-size: 30px;
+    position: absolute;
+    right: 50%;
+}
+
+.table {
+    background: #2797cb;
+}
+
+.table__info-block {
+
+}
+
+.info-block {
+    align-items: center;
+    border: 2px dotted;
+    display: flex;
+    height: 50px;
+    padding: 0 20px;
+}
+
+.info-block__table-name {
+    color: white;
+    font: normal 600 24px'Pacifico', cursive;
+    letter-spacing: 2px;
+}
+
+.info-block__customization {
+    background-color: rgba(255, 255, 255, .3);
+    border-radius: 10px;
+    color: white;
+    display: block;
+    margin-left: auto;
+    padding: 10px;
+}
+
+.info-block__customization::before {
+    content: "\00B7 \00B7 \00B7";
+    padding: 6px;
+}
+
+.customization {
+
+}
+
+.table__content-block {
+    height: calc(100vh - 90px);
+}
+
+.table__list-columns {
+    display: flex;
+    list-style: none;
+    margin: 0 10px;
+    padding: 0;
+}
+
+.table__column {
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.column {
+    background: #efefef;
+    border-radius: 10px;
+    height: fit-content;
+    width: 250px;
+}
+
+.column__name {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 5px;
+}
+
+.add-column {
+    background-color: rgba(255, 255, 255, .3);
+}
+
+.add-column__text {
+    color: white;
+    display: block;
+    font-size: 16px;
+}
+
+.column__list-cards {
+    display: flex;
+    flex-flow: column;
+}
+
+.column__card {
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.card {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 0 rgba(9,30,66,.25);
+}
+
+.card:hover {
+    background: lightgray;
+}
+
+.column__add-card {
+    border-radius: 10px;
+    display: block;
+    padding: 5px;
+}
+
+.column__add-card:hover {
+    background-color: lightgray;
+}
