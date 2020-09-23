@@ -19,17 +19,26 @@ body {
     left: 0;
     position: absolute;
     top: 0;
-    visibility: visible;
+    visibility: hidden;
     width: 100vw;
 }
 
 .popup__title {
     background-color: lavender;
     border-radius: 10px 10px 0 0;
+    cursor: default;
     display: block;
     font-size: 30px;
     padding: 10px 0;
     text-align: center;
+}
+
+.popup__close-button {
+    cursor: pointer;
+    font-size: 40px;
+    left: 90%;
+    position: absolute;
+    top: 5px;
 }
 
 .popup__divider {
@@ -41,6 +50,8 @@ body {
     border-radius: 10px;
     margin: 100px auto 0;
     min-height: 300px;
+    position: relative;
+    visibility: hidden;
     width: 600px;
 }
 
@@ -116,7 +127,7 @@ body {
 }
 
 .table {
-    background: #2797cb;
+    background-color: #2797cb;
 }
 
 .table__info-block {
@@ -152,7 +163,7 @@ body {
 }
 
 .customization {
-
+    cursor: pointer;
 }
 
 .table__content-block {
