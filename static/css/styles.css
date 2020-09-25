@@ -13,86 +13,6 @@ body {
     margin: 0;
 }
 
-.popup {
-    background-color: rgba(0, 0, 0, .5);
-    display: none;
-    height: 100vh;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100vw;
-}
-
-.popup__title {
-    background-color: lavender;
-    border-radius: 10px 10px 0 0;
-    cursor: default;
-    display: block;
-    font-size: 30px;
-    padding: 10px 0;
-    text-align: center;
-}
-
-.popup__close-button {
-    cursor: pointer;
-    font-size: 40px;
-    left: 90%;
-    position: absolute;
-    top: 5px;
-}
-
-.popup__divider {
-    margin: 0;
-}
-
-.popup__customization,
-.popup__add-card {
-    background-color: white;
-    border-radius: 10px;
-    display: none;
-    margin: 100px auto 0;
-    position: relative;
-    width: 600px;
-}
-
-.customization-form,
-.add-card-form {
-    padding: 20px;
-}
-
-.popup__form-block {
-    font-size: 20px;
-}
-
-.popup__label {
-    display: block;
-}
-
-.popup__input {
-    border: 1px solid;
-    border-radius: 10px;
-    height: 30px;
-    margin: 10px 0;
-    outline: none;
-    padding: 0 15px;
-    width: 95%;
-}
-
-.popup__submit-button {
-    background-color: gold;
-    border: 1px solid;
-    cursor: pointer;
-    font-size: 18px;
-    height: 40px;
-    margin: 20px 0 0;
-    outline: none;
-    width: 100%;
-}
-
-.popup__submit-button:hover {
-    background-color: palegoldenrod;
-}
-
 .header {
     align-items: center;
     background: black;
@@ -191,19 +111,70 @@ body {
 }
 
 .column__name {
+    cursor: default;
+    display: flex;
     font-size: 18px;
     font-weight: 600;
+    justify-content: space-between;
     margin: 5px;
+}
+
+.column__editing {
+    border-radius: 25px;
+    cursor: pointer;
+    padding: 0 7px 7px;
+    position: relative;
+    top: -5px;
+    z-index: 0;
+}
+
+.column__editing:hover {
+    background-color: lightgray;
 }
 
 .add-column {
     background-color: rgba(255, 255, 255, .3);
+    cursor: pointer;
+}
+
+.add-column:hover {
+    background-color: rgba(255, 255, 255, .4);
 }
 
 .add-column__text {
     color: white;
     display: block;
     font-size: 16px;
+}
+
+.add-column__form {
+    display: none;
+}
+
+.add-column__label {
+
+}
+
+.add-column__input {
+    border: none;
+    height: 25px;
+    padding: 0;
+    text-indent: 10px;
+    width: 100%;
+}
+
+.add-column__button-block {
+    display: flex;
+    padding: 10px 0 0;
+}
+
+.add-column__create-button,
+.add-column__close-button {
+    cursor: pointer;
+    font-size: 22px;
+    margin: 0 2px;
+    padding: 0 5px;
+    width: 50%;
 }
 
 .column__list-cards {

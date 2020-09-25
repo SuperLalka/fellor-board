@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <title>Fellor</title>
   <link rel="stylesheet" href="static/css/styles.css">
+  <link rel="stylesheet" href="static/css/popups.css">
+  <link rel="stylesheet" href="static/css/context_menu.css">
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
 </head>
@@ -15,7 +17,7 @@
     <h2 class="popup__title">Настройки</h2>
     <i class="popup__close-button">&#10006;</i>
     <hr class="popup__divider">
-    <form class="popup__form customization-form" action="#" method="get">
+    <form class="popup__form customization-form">
       <div class="popup__form-block">
         <label class="popup__label" for="name_field">Настройка названия доски</label>
         <input class="popup__input" id="name_field" type="text" placeholder="например: Fellor-board">
@@ -37,6 +39,53 @@
       </div>
     </form>
   </div>
+  <div class="popup__editing-object">
+    <h2 class="popup__title">Редактировать карточку</h2>
+    <p class="popup__title-text"></p>
+    <i class="popup__close-button">&#10006;</i>
+    <hr class="popup__divider">
+    <div class="popup__object-block object-block">
+      <h3 class="object-block__title"></h3>
+      <form class="popup__form card-rename-form" action="#" method="get">
+        <div class="popup__form-block">
+          <label class="popup__label" for="card_rename"></label>
+          <input class="popup__input popup__input_lower-border" id="card_rename" type="text">
+        </div>
+      </form>
+      <i class="object-block__title-editing">&#9998;</i>
+      <div class="object-block__object">
+        <div class="object-block__information">
+        </div>
+        <div class="object-block__actions actions">
+          <button class="actions__copy-button">Копировать карточку</button>
+          <button class="actions__delete-button">Удалить карточку</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="popup__additional-settings additional-settings">
+    <div class="additional-settings__block">
+    </div>
+  </div>
+</div>
+<div class="context-menu">
+  <p class="context-menu__title">Действия с колонкой</p>
+  <i class="context-menu__close-button">&#10006;</i>
+  <ul class="context-menu__action-list">
+    <li class="context-menu__action-item action-item">
+      <button class="action-item__rename-button">Переименовать колонку</button>
+      <form class="action-item__rename-form" action="#" method="get">
+          <label class="action-item__label" for="rename_column_field"></label>
+          <input class="action-item__input" id="rename_column_field" type="text" placeholder="Введите новое название">
+      </form>
+    </li>
+    <li class="context-menu__action-item action-item">
+      <button class="action-item__copy-button">Копировать колонку</button>
+    </li>
+    <li class="context-menu__action-item action-item">
+      <button class="action-item__delete-button">Удалить колонку</button>
+    </li>
+  </ul>
 </div>
 <!-- popups end -->
 <!-- header -->
@@ -57,7 +106,7 @@
   <div class="table__content-block">
     <ul class="table__list-columns">
       <li class="table__column column">
-        <p class="column__name">Column name</p>
+        <p class="column__name">First Column<i class="column__editing">...</i></p>
         <div class="column__list-cards">
           <a class="column__card card" href="#">
             Название карточки
@@ -74,7 +123,7 @@
         </p>
       </li>
       <li class="table__column column">
-        <p class="column__name">Column name</p>
+        <p class="column__name">Second Column<span class="column__editing">...</span></p>
         <div class="column__list-cards"></div>
         <p class="column__add-card">
           + Добавить карточку
@@ -82,6 +131,14 @@
       </li>
       <div class="table__column column add-column">
         <a class="add-column__text" href="#">+ Добавьте ещё одну колонку</a>
+        <form class="add-column__form" action="#" method="get">
+          <label class="add-column__label" for="add_column_field"></label>
+          <input class="add-column__input" id="add_column_field" type="text">
+          <div class="add-column__button-block">
+            <button class="add-column__create-button" type="submit">&#10004;</button>
+            <button class="add-column__close-button">&#10006;</button>
+          </div>
+        </form>
       </div>
     </ul>
   </div>

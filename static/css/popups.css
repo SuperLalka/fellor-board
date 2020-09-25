@@ -1,0 +1,201 @@
+
+
+.popup {
+    background-color: rgba(0, 0, 0, .5);
+    display: none;
+    height: 100vh;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    z-index: 1;
+}
+
+.popup__title {
+    background-color: lavender;
+    border-radius: 10px 10px 0 0;
+    cursor: default;
+    display: block;
+    font-size: 30px;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.popup__title-text {
+    background-color: lavender;
+    cursor: default;
+    padding: 0 20px;
+}
+
+.popup__close-button {
+    cursor: pointer;
+    font-size: 40px;
+    left: 90%;
+    position: absolute;
+    top: 5px;
+}
+
+.popup__close-button:hover {
+    color: red;
+}
+
+.popup__divider {
+    margin: 0;
+}
+
+.popup__customization,
+.popup__add-card,
+.popup__editing-object {
+    background-color: white;
+    border-radius: 10px;
+    display: none;
+    margin: 100px auto 0;
+    position: relative;
+    width: 600px;
+}
+
+.customization-form,
+.add-card-form {
+    padding: 20px;
+}
+
+.card-rename-form {
+    display: none;
+    margin: auto;
+    padding: 20px;
+    width: 70%;
+}
+
+.popup__form-block {
+    font-size: 20px;
+}
+
+.popup__label {
+    display: block;
+}
+
+.popup__input {
+    border: none;
+    border-bottom: 1px solid;
+    font-size: 22px;
+    height: 30px;
+    margin: 10px 0;
+    outline: none;
+    text-indent: 10px;
+    width: 100%;
+}
+
+.popup__input_lower-border {
+    border: none;
+    border-bottom: 1px solid;
+    border-radius: inherit;
+}
+
+.popup__submit-button {
+    background-color: gold;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 18px;
+    height: 40px;
+    margin: 20px 0 0;
+    outline: none;
+    width: 100%;
+}
+
+.popup__submit-button:hover {
+    background-color: palegoldenrod;
+}
+
+.popup__object-block {
+
+}
+
+.object-block {
+    position: relative;
+}
+
+.object-block__title {
+    display: block;
+    font-size: 22px;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.object-block__title-editing {
+    border: 1px dotted transparent;
+    cursor: pointer;
+    display: none;
+    font-size: 40px;
+    padding: 0 10px 0 2px;
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    transition: .5s;
+}
+
+.object-block__title-editing:hover {
+    border: 1px dotted red;
+    border-radius: 50%;
+}
+
+.object-block__object {
+    display: flex;
+    padding: 0 20px;
+}
+
+.object-block__information {
+    width: 75%;
+}
+
+.object-block__actions {
+
+}
+
+.actions {
+    display: flex;
+    flex-flow: column;
+    width: 25%;
+}
+
+.actions__copy-button,
+.actions__delete-button {
+    margin: 5px 0;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.popup__additional-settings {
+    display: none;
+    position: absolute;
+    top: 0;
+}
+
+.additional-settings {
+    background: #b3c0ff;
+    border: 5px solid;
+    border-radius: 10px;
+    margin: auto;
+    position: relative;
+    width: 900px;
+}
+
+.additional-settings__block {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-evenly;
+    padding: 20px;
+}
+
+.additional-settings__choice-item {
+    background-color: white;
+    border: 1px solid;
+    border-radius: 25px 0;
+    cursor: pointer;
+    font-size: 26px;
+    padding: 10px;
+}
+
+.additional-settings__choice-item:hover {
+    background-color: gold;
+}
