@@ -1,4 +1,4 @@
-@import url(//fonts.googleapis.com/css2?family=Pacifico&display=swap);
+@import url(//fonts.googleapis.com/css2?family=Philosopher:wght@400;700&display=swap);
 
 
 p, h2 {
@@ -35,9 +35,26 @@ body {
     padding: 0 5px;
 }
 
+.header__search-form {
+
+}
+
 .header__search-input {
+    background-color: black;
+    border: 1px solid white;
+    color: white;
+    font-size: 20px;
     height: 25px;
     margin: 0 20px;
+    outline: none;
+    text-indent: 10px;
+    width: 100px;
+}
+
+.header__search-input:focus {
+    background-color: white;
+    color: black;
+    width: 250px;
 }
 
 .header__title {
@@ -65,7 +82,7 @@ body {
 
 .info-block__table-name {
     color: white;
-    font: normal 600 24px'Pacifico', cursive;
+    font: normal 600 24px 'Philosopher', sans-serif;
     letter-spacing: 2px;
 }
 
@@ -106,6 +123,7 @@ body {
 .column {
     background: #efefef;
     border-radius: 10px;
+    position: relative;
     height: fit-content;
     width: 250px;
 }
@@ -123,8 +141,9 @@ body {
     border-radius: 25px;
     cursor: pointer;
     padding: 0 7px 7px;
-    position: relative;
-    top: -5px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
     z-index: 0;
 }
 
@@ -135,6 +154,7 @@ body {
 .add-column {
     background-color: rgba(255, 255, 255, .3);
     cursor: pointer;
+    margin-right: 10px;
 }
 
 .add-column:hover {
@@ -143,12 +163,15 @@ body {
 
 .add-column__text {
     color: white;
+    cursor: pointer;
     display: block;
     font-size: 16px;
+    padding: 10px;
 }
 
 .add-column__form {
     display: none;
+    padding: 10px;
 }
 
 .add-column__label {
@@ -191,6 +214,7 @@ body {
     background: white;
     border-radius: 5px;
     box-shadow: 0 2px 0 rgba(9,30,66,.25);
+    cursor: pointer;
 }
 
 .card:hover {

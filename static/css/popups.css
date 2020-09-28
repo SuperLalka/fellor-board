@@ -1,6 +1,6 @@
 
 
-.popup {
+.background-popup {
     background-color: rgba(0, 0, 0, .5);
     display: none;
     height: 100vh;
@@ -13,18 +13,13 @@
 
 .popup__title {
     background-color: lavender;
+    border-bottom: 1px solid;
     border-radius: 10px 10px 0 0;
     cursor: default;
     display: block;
     font-size: 30px;
     padding: 10px 0;
     text-align: center;
-}
-
-.popup__title-text {
-    background-color: lavender;
-    cursor: default;
-    padding: 0 20px;
 }
 
 .popup__close-button {
@@ -37,10 +32,6 @@
 
 .popup__close-button:hover {
     color: red;
-}
-
-.popup__divider {
-    margin: 0;
 }
 
 .popup__customization,
@@ -59,7 +50,7 @@
     padding: 20px;
 }
 
-.card-rename-form {
+.object-block__rename-form {
     display: none;
     margin: auto;
     padding: 20px;
@@ -72,14 +63,18 @@
 
 .popup__label {
     display: block;
+    font-size: 26px;
+}
+
+.popup__label_big {
+    padding: 10px 0;
 }
 
 .popup__input {
     border: none;
     border-bottom: 1px solid;
     font-size: 22px;
-    height: 30px;
-    margin: 10px 0;
+    height: 35px;
     outline: none;
     text-indent: 10px;
     width: 100%;
@@ -125,7 +120,7 @@
 .object-block__title-editing {
     border: 1px dotted transparent;
     cursor: pointer;
-    display: none;
+    display: block;
     font-size: 40px;
     padding: 0 10px 0 2px;
     position: absolute;
@@ -172,28 +167,28 @@
 }
 
 .additional-settings {
-    background: #b3c0ff;
-    border: 5px solid;
+    border: 1px solid;
     border-radius: 10px;
     margin: auto;
     position: relative;
-    width: 900px;
+    width: 75vw;
 }
 
 .additional-settings__block {
     display: flex;
     flex-flow: row;
-    justify-content: space-evenly;
-    padding: 20px;
+    flex-wrap: wrap;
+    justify-content: stretch;
 }
 
 .additional-settings__choice-item {
     background-color: white;
     border: 1px solid;
-    border-radius: 25px 0;
     cursor: pointer;
+    flex: 1;
     font-size: 26px;
     padding: 10px;
+    text-align: center;
 }
 
 .additional-settings__choice-item:hover {
