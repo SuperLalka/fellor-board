@@ -153,6 +153,7 @@
     width: 25%;
 }
 
+.actions__move-button,
 .actions__copy-button,
 .actions__delete-button {
     margin: 5px 0;

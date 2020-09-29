@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Поиск по названиям карт
     $(".header__search-input").on('change', searchByCards);
 
+        // Очистка поля формы поиска
+        $(".header__search-reset").on('click', resetSearchInput);
+
     // Pop-up кастомизации доски
     // Вызов pop-up окна кастомизации доски
     $(".info-block > .customization").on('click', function () {
@@ -37,14 +40,17 @@ document.addEventListener("DOMContentLoaded", function() {
         $(".object-block__title-editing").on('click', toggleRenameForm);
 
         // Перемещение объекта
-        $("button.actions__copy-button").on('click', moveObject);
+        $("button.actions__move-button").on('click', moveObject);
+
+        // Копирование объекта
+        $("button.actions__copy-button").on('click', copyObject);
 
         // Удаление объекта
         $("button.actions__delete-button").on('click', removeObject);
 
     // Универсальная кнопка закрытия pop-up'a
     $(".popup__close-button").on('click', function () {
-        popupToggle($(this).closest('div').attr("class"), close_bg=true);
+        popupToggle($(this).closest('div').attr("class"), close_bg=true)
     });
 
     // Отображает форму ввода названия новой колонки
@@ -62,15 +68,25 @@ function searchByCards() {
     let key = $(this).val().toLowerCase();
 
     if (key) {
-        let allCards = $(".column__card").toArray()
+        $('.header__search-reset').css({"visibility": "visible"});
+        let allCards = $(".column__card").toArray();
         for (let card in allCards) {
             if (!(allCards[card].outerText.toLowerCase().includes(key))) {
-                $(allCards[card]).css({"visibility": "hidden"})
+                $(allCards[card]).css({"visibility": "hidden"});
             }
         }
     } else {
-        $(".column__card").css({"visibility": "visible"})
+        $(".column__card").css({"visibility": "visible"});
+        resetSearchInput();
     }
+}
+
+
+// Функция очистки поля поиска
+function resetSearchInput() {
+    $(".column__card").css({"visibility": "visible"});
+    $('.header__search-reset').css({"visibility": "hidden"});
+    $(this).siblings('input[id="search_field"]').val('');
 }
 
 
@@ -117,17 +133,17 @@ function addCardFormProcessing(event) {
             'class': 'column__card card'
         });
         newCard.on('click', function () {openObject ($(this), 'card')});
-        $(operationObject).siblings('.column > .column__list-cards').append(newCard)
+        $(operationObject).siblings('.column > .column__list-cards').append(newCard);
     }
 
-    popupToggle('popup__add-card', close_bg=true)
+    popupToggle('popup__add-card', close_bg=true);
 }
 
 
 // Функция вызова pop-up'a окна редактирования карточки, также определяет актуальную карточку в переменную
 function openObject(object, type) {
     operationObjectType = type;
-    popupToggle('popup__editing-object', close_bg = true)
+    popupToggle('popup__editing-object', close_bg = true);
     if (operationObjectType === 'card') {
         operationObject = object;
         $(".object-block__title").text(operationObject.text());
@@ -159,11 +175,10 @@ function toggleRenameForm() {
             $(form).find('input[id="object_rename_field"]').val('');
         }
 
-        // openObject()
-
         $(this).siblings('.object-block__title').css({"display": "block"});
         $(this).siblings('.object-block__rename-form').css({"display": "none"});
         waitingForRenaming = false;
+        openObject($(operationObject), 'card')
     }
 }
 
@@ -184,12 +199,20 @@ function moveObject() {
     popupToggle('popup__editing-object');
 }
 
+// Функция копирования объекта
+function copyObject() {
+    console.log((operationObject))
+    $(operationObject).after(operationObject.clone(true));
+    popupToggle('popup__editing-object', close_bg=true);
+}
+
 
 // Функция перемещения объекта
 function columnToMoveCard() {
     let nameColumn = this.textContent;
     if (operationObjectType === 'card') {
-        $(".column__name:contains(" + nameColumn + ")").siblings('.column__list-cards').append($(operationObject));
+        $(".column__name:contains(" + nameColumn + ")").siblings(
+            '.column__list-cards').append($(operationObject));
     } else if (operationObjectType === 'column') {
         $(".column:contains(" + nameColumn + ")").before($(operationObject));
     }
@@ -236,8 +259,8 @@ function createNewColumn(event) {
         newColumn.find('.column__editing').on('click', function () {
             openObject ($(this), 'column')});
 
-        $('.table__list-columns li:last').after(newColumn)
+        $('.table__list-columns li:last').after(newColumn);
     }
 
-    displayNameNewColumnForm()
+    displayNameNewColumnForm();
 }
