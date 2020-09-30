@@ -80,48 +80,23 @@
     <div class="info-block__customization customization">Кастомизация</div>
   </div>
   <div class="table__content-block">
-    <ul class="table__list-columns">
-      <li class="table__column column">
-        <p class="column__name">First Column</p>
-        <i class="column__editing">...</i>
-        <div class="column__list-cards">
-          <div class="column__card card">
-            Название карточки
-          </div>
-          <div class="column__card card">
-            Название карточки
-          </div>
-          <div class="column__card card">
-            Очень длинное название карточки
-          </div>
+    <ul class="table__list-columns"></ul>
+    <div class="column add-column">
+      <p class="add-column__text">+ Добавьте ещё одну колонку</p>
+      <form class="add-column__form" action="#" method="get">
+        <label class="add-column__label" for="add_column_field"></label>
+        <input class="add-column__input" id="add_column_field" type="text">
+        <div class="add-column__button-block">
+          <button class="add-column__create-button" type="submit">&#10004;</button>
+          <button class="add-column__close-button">&#10006;</button>
         </div>
-        <p class="column__add-card">
-          + Добавить карточку
-        </p>
-      </li>
-      <li class="table__column column">
-        <p class="column__name">Second Column</p>
-        <i class="column__editing">...</i>
-        <div class="column__list-cards"></div>
-        <p class="column__add-card">
-          + Добавить карточку
-        </p>
-      </li>
-      <div class="column add-column">
-        <p class="add-column__text">+ Добавьте ещё одну колонку</p>
-        <form class="add-column__form" action="#" method="get">
-          <label class="add-column__label" for="add_column_field"></label>
-          <input class="add-column__input" id="add_column_field" type="text">
-          <div class="add-column__button-block">
-            <button class="add-column__create-button" type="submit">&#10004;</button>
-            <button class="add-column__close-button">&#10006;</button>
-          </div>
-        </form>
-      </div>
-    </ul>
+      </form>
+    </div>
   </div>
 </main>
 <!-- main end -->
 </body>
-<script src="static/js/scripts.js"></script>
+<script type="module" src="static/js/draw.js"></script>
+<script type="module" src="static/js/model.js"></script>
+<script type="module" src="static/js/scripts.js"></script>
 </html>

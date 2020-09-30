@@ -1,56 +1,63 @@
+import * as drawModule from './draw.js';
+import * as modelModule from './model.js';
+
 var close_bg;
 var operationObject;
 var operationObjectType
 var waitingForRenaming;
 
+var storage = [];
+
 
 // Обработчик, когда DOM будет полностью загружен
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     // Поиск по названиям карт
     $(".header__search-input").on('change', searchByCards);
 
-        // Очистка поля формы поиска
-        $(".header__search-reset").on('click', resetSearchInput);
+    // Очистка поля формы поиска
+    $(".header__search-reset").on('click', resetSearchInput);
 
     // Pop-up кастомизации доски
     // Вызов pop-up окна кастомизации доски
     $(".info-block > .customization").on('click', function () {
-        popupToggle("popup__customization", close_bg=true);
+        popupToggle("popup__customization", close_bg = true);
     });
 
-        // Обработка формы из pop-up'a кастомизации доски
-        $(".popup__customization > .customization-form").on('submit', customizationFormProcessing);
+    // Обработка формы из pop-up'a кастомизации доски
+    $(".popup__customization > .customization-form").on('submit', customizationFormProcessing);
 
     // Pop-up добавления новой карточки
     // Вызов pop-up окна добавления новой карточки
     $(".column > .column__add-card").on('click', popupAddCart);
 
-        // Обработка формы из pop-up'a добавления новой карточки
-        $(".popup__add-card > .add-card-form").on('submit', addCardFormProcessing);
+    // Обработка формы из pop-up'a добавления новой карточки
+    $(".popup__add-card > .add-card-form").on('submit', addCardFormProcessing);
 
     // Pop-up редактирования карточки или колонки
     // Вызов pop-up окна редактирования карточки или колонки
     $(".column__list-cards > .card").on('click', function () {
-        openObject ($(this), 'card')});
+        openObject($(this), 'card')
+    });
     $(".column > .column__editing").on('click', function () {
-        openObject ($(this), 'column')});
+        openObject($(this), 'column')
+    });
 
-        // Переключение и обработка формы переименования
-        $(".object-block__title-editing").on('click', toggleRenameForm);
+    // Переключение и обработка формы переименования
+    $(".object-block__title-editing").on('click', toggleRenameForm);
 
-        // Перемещение объекта
-        $("button.actions__move-button").on('click', moveObject);
+    // Перемещение объекта
+    $("button.actions__move-button").on('click', moveObject);
 
-        // Копирование объекта
-        $("button.actions__copy-button").on('click', copyObject);
+    // Копирование объекта
+    $("button.actions__copy-button").on('click', copyObject);
 
-        // Удаление объекта
-        $("button.actions__delete-button").on('click', removeObject);
+    // Удаление объекта
+    $("button.actions__delete-button").on('click', removeObject);
 
     // Универсальная кнопка закрытия pop-up'a
     $(".popup__close-button").on('click', function () {
-        popupToggle($(this).closest('div').attr("class"), close_bg=true)
+        popupToggle($(this).closest('div').attr("class"), close_bg = true)
     });
 
     // Отображает форму ввода названия новой колонки
@@ -111,37 +118,35 @@ function customizationFormProcessing(event) {
     if (bgcolor_field) {
         $(".table").css({"background-color": bgcolor_field});
     }
-    popupToggle('popup__customization', close_bg=true);
+    popupToggle('popup__customization', close_bg = true);
 }
 
 
-// Функция вызова pop-up'a окна добавления новой карточки, также определяет актуальную колонку в переменную
-function popupAddCart() {
-    operationObject = $(this);
-    popupToggle('popup__add-card', close_bg=true);
+// Функция вызова pop-up'a окна добавления новой карточки, также определяет объект колонки в переменную
+export function popupAddCart() {
+    operationObject = $(this).closest('.column');
+    popupToggle('popup__add-card', close_bg = true);
 }
 
 
 // Функция обработки формы из pop-up'a добавления новой карточки
 function addCardFormProcessing(event) {
     event.preventDefault();
-    let add_card_field = $(this).find('input[id="add_card_field"]').val();
+    let new_card_name = $(this).find('input[id="add_card_field"]').val();
+    let column_name = operationObject.find('.column__name').text()
 
-    if (add_card_field) {
-        let newCard = $('<div>', {
-            'text': add_card_field,
-            'class': 'column__card card'
-        });
-        newCard.on('click', function () {openObject ($(this), 'card')});
-        $(operationObject).siblings('.column > .column__list-cards').append(newCard);
+    if (new_card_name) {
+        storage = modelModule.addObject(storage, column_name, new_card_name, 'card');
+        $(this).find('input[id="add_card_field"]').val('');
+        drawModule.draw(storage);
     }
 
-    popupToggle('popup__add-card', close_bg=true);
+    popupToggle('popup__add-card', close_bg = true);
 }
 
 
-// Функция вызова pop-up'a окна редактирования карточки, также определяет актуальную карточку в переменную
-function openObject(object, type) {
+// Функция вызова pop-up'a окна редактирования объекта, также определяет объект операции в переменную
+export function openObject(object, type) {
     operationObjectType = type;
     popupToggle('popup__editing-object', close_bg = true);
     if (operationObjectType === 'card') {
@@ -163,16 +168,21 @@ function toggleRenameForm() {
         waitingForRenaming = true;
     } else {
         let form = $(this).siblings('.object-block__rename-form');
-        let object_rename_field = form.find('input[id="object_rename_field"]').val();
+        let new_name = form.find('input[id="object_rename_field"]').val();
 
-        if (object_rename_field) {
-
+        if (new_name) {
             if (operationObjectType === 'card') {
-                $(operationObject).text(object_rename_field);
+                let card_name = operationObject.text();
+                let column_name = operationObject.closest('.column').find('.column__name').text();
+
+                storage = modelModule.renameObject(storage, column_name, card_name, 'card', new_name);
             } else if (operationObjectType === 'column') {
-                $(operationObject).find('.column__name').text(object_rename_field);
+                let column_name = operationObject.find('.column__name').text();
+
+                storage = modelModule.renameObject(storage, column_name, false, 'column', new_name);
             }
             $(form).find('input[id="object_rename_field"]').val('');
+            drawModule.draw(storage);
         }
 
         $(this).siblings('.object-block__title').css({"display": "block"});
@@ -201,9 +211,8 @@ function moveObject() {
 
 // Функция копирования объекта
 function copyObject() {
-    console.log((operationObject))
     $(operationObject).after(operationObject.clone(true));
-    popupToggle('popup__editing-object', close_bg=true);
+    popupToggle('popup__editing-object', close_bg = true);
 }
 
 
@@ -217,14 +226,24 @@ function columnToMoveCard() {
         $(".column:contains(" + nameColumn + ")").before($(operationObject));
     }
     $(".additional-settings__block").remove();
-    popupToggle('popup__additional-settings', close_bg=true);
+    popupToggle('popup__additional-settings', close_bg = true);
 }
 
 
 // Функция удаления объекта
 function removeObject() {
-    $(operationObject).remove();
-    popupToggle('popup__editing-object', close_bg=true);
+    if (operationObjectType === 'card') {
+        let card_name = operationObject.text();
+        let column_name = operationObject.closest('.column').find('.column__name').text();
+
+        storage = modelModule.removeObject(storage, column_name, card_name, 'card');
+    } else if (operationObjectType === 'column') {
+        let column_name = operationObject.find('.column__name').text();
+
+        storage = modelModule.removeObject(storage, column_name, false, 'column');
+    }
+    drawModule.draw(storage);
+    popupToggle('popup__editing-object', close_bg = true);
 }
 
 
@@ -238,28 +257,12 @@ function displayNameNewColumnForm() {
 // Функция обработки формы ввода имени и создания новой колонки
 function createNewColumn(event) {
     event.preventDefault();
-    let add_column_field = $(this).find('input[id="add_column_field"]').val();
+    let new_column_name = $(this).find('input[id="add_column_field"]').val();
 
-    if (add_column_field) {
-        let newColumn = ($('<li>', {
-            'class': 'table__column column'
-        })).append($('<p>', {
-            'text': add_column_field,
-            'class': 'column__name'
-        })).append($('<i>', {
-            'text': '...',
-            'class': 'column__editing'
-        })).append($('<div>', {
-            'class': 'column__list-cards'
-        })).append($('<p>', {
-            'text': '+ Добавить карточку',
-            'class': 'column__add-card'
-        }));
-        newColumn.find('.column__add-card').on('click', popupAddCart);
-        newColumn.find('.column__editing').on('click', function () {
-            openObject ($(this), 'column')});
-
-        $('.table__list-columns li:last').after(newColumn);
+    if (new_column_name) {
+        storage = modelModule.addObject(storage, new_column_name, false, 'column');
+        $(this).find('input[id="add_column_field"]').val('');
+        drawModule.draw(storage);
     }
 
     displayNameNewColumnForm();
