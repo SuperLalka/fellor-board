@@ -36,12 +36,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Pop-up редактирования карточки или колонки
     // Вызов pop-up окна редактирования карточки или колонки
-    $(".column__list-cards > .card").on('click', function () {
-        openObject($(this), 'card')
-    });
-    $(".column > .column__editing").on('click', function () {
-        openObject($(this), 'column')
-    });
+    // $(".column__list-cards > .card").on('click', function () {
+    //     openObject($(this))
+    // });
+    // $(".column > .column__editing").on('click', function () {
+    //     console.log($(this))
+    //     openObject($(this).closest('.column'))
+    // });
 
     // Переключение и обработка формы переименования
     $(".object-block__title-editing").on('click', toggleRenameForm);
@@ -75,16 +76,14 @@ function searchByCards() {
     let key = $(this).val().toLowerCase();
 
     if (key) {
+        let results;
         $('.header__search-reset').css({"visibility": "visible"});
-        let allCards = $(".column__card").toArray();
-        for (let card in allCards) {
-            if (!(allCards[card].outerText.toLowerCase().includes(key))) {
-                $(allCards[card]).css({"visibility": "hidden"});
-            }
-        }
+        results = modelModule.searchByCards(key);
+        drawModule.draw(...results);
     } else {
         $(".column__card").css({"visibility": "visible"});
         resetSearchInput();
+        drawModule.draw(storage);
     }
 }
 
@@ -133,30 +132,23 @@ export function popupAddCart() {
 function addCardFormProcessing(event) {
     event.preventDefault();
     let new_card_name = $(this).find('input[id="add_card_field"]').val();
-    let column_name = operationObject.find('.column__name').text()
+    let column_index = ($(operationObject)).attr('data-column-id');
 
     if (new_card_name) {
-        storage = modelModule.addObject(storage, column_name, new_card_name, 'card');
-        $(this).find('input[id="add_card_field"]').val('');
+        storage = modelModule.addObject(new_card_name, 'card', column_index);
         drawModule.draw(storage);
     }
-
+    $(this).find('input[id="add_card_field"]').val('');
     popupToggle('popup__add-card', close_bg = true);
 }
 
 
-// Функция вызова pop-up'a окна редактирования объекта, также определяет объект операции в переменную
-export function openObject(object, type) {
-    operationObjectType = type;
+// Функция вызова pop-up'a окна редактирования объекта, также определяет объект операции и его тип в переменную
+export function openObject(object) {
+    operationObject = object;
+    operationObjectType = object.attr('data-object-type');
     popupToggle('popup__editing-object', close_bg = true);
-    if (operationObjectType === 'card') {
-        operationObject = object;
-        $(".object-block__title").text(operationObject.text());
-    } else if (operationObjectType === 'column') {
-        operationObject = object.closest('.column');
-        $(".object-block__title").text(operationObject.find('.column__name').text());
-    }
-
+    $(".object-block__title").text($(object).attr('data-object-name'));
 }
 
 
@@ -171,16 +163,15 @@ function toggleRenameForm() {
         let new_name = form.find('input[id="object_rename_field"]').val();
 
         if (new_name) {
+            let column_index = operationObject.attr('data-column-id');
+
             if (operationObjectType === 'card') {
-                let card_name = operationObject.text();
-                let column_name = operationObject.closest('.column').find('.column__name').text();
-
-                storage = modelModule.renameObject(storage, column_name, card_name, 'card', new_name);
+                let card_index = operationObject.attr('data-card-id');
+                storage = modelModule.renameObject(column_index, card_index, operationObjectType, new_name);
             } else if (operationObjectType === 'column') {
-                let column_name = operationObject.find('.column__name').text();
-
-                storage = modelModule.renameObject(storage, column_name, false, 'column', new_name);
+                storage = modelModule.renameObject(column_index, false, operationObjectType, new_name);
             }
+
             $(form).find('input[id="object_rename_field"]').val('');
             drawModule.draw(storage);
         }
@@ -199,48 +190,64 @@ function moveObject() {
         $('<div>', {'class': 'additional-settings__block'}));
 
     $(".column__name").each(function () {
+        let columnID = $(this).closest('.column').attr('data-column-id');
         let columnForChoice = $('<div>', {
             'text': $(this).text(),
-            'class': 'additional-settings__choice-item'
+            'class': 'additional-settings__choice-item',
+            'data-column-id': columnID
         });
-        columnForChoice.on('click', columnToMoveCard);
+        columnForChoice.on('click', columnToMoveObject);
         $('.additional-settings__block').append(columnForChoice);
     });
     popupToggle('popup__editing-object');
 }
 
-// Функция копирования объекта
-function copyObject() {
-    $(operationObject).after(operationObject.clone(true));
-    popupToggle('popup__editing-object', close_bg = true);
-}
-
 
 // Функция перемещения объекта
-function columnToMoveCard() {
-    let nameColumn = this.textContent;
-    if (operationObjectType === 'card') {
-        $(".column__name:contains(" + nameColumn + ")").siblings(
-            '.column__list-cards').append($(operationObject));
-    } else if (operationObjectType === 'column') {
-        $(".column:contains(" + nameColumn + ")").before($(operationObject));
+function columnToMoveObject() {
+    let new_column_index = $(this).attr('data-column-id');
+    let column_index = operationObject.attr('data-column-id');
+
+    if (new_column_index !== column_index) {
+        if (operationObjectType === 'card') {
+            let card_index = operationObject.attr('data-card-id');
+            storage = modelModule.moveObject(column_index, new_column_index, card_index, operationObjectType);
+        } else if (operationObjectType === 'column') {
+            storage = modelModule.moveObject(column_index, new_column_index, false, operationObjectType);
+        }
     }
+
+    drawModule.draw(storage);
     $(".additional-settings__block").remove();
     popupToggle('popup__additional-settings', close_bg = true);
 }
 
 
+// Функция копирования объекта
+function copyObject() {
+    let column_index = operationObject.attr('data-column-id');
+    let object_name = operationObject.attr('data-object-name');
+
+    if (operationObjectType === 'card') {
+        let card_index = operationObject.attr('data-card-id');
+        storage = modelModule.copyObject(column_index, card_index, operationObjectType, object_name);
+    } else if (operationObjectType === 'column') {
+        storage = modelModule.copyObject(column_index, false, operationObjectType, object_name);
+    }
+    drawModule.draw(storage);
+    popupToggle('popup__editing-object', close_bg = true);
+}
+
+
 // Функция удаления объекта
 function removeObject() {
+    let column_index = operationObject.attr('data-column-id');
+
     if (operationObjectType === 'card') {
-        let card_name = operationObject.text();
-        let column_name = operationObject.closest('.column').find('.column__name').text();
-
-        storage = modelModule.removeObject(storage, column_name, card_name, 'card');
+        let card_index = operationObject.attr('data-card-id');
+        storage = modelModule.removeObject(column_index, card_index, operationObjectType);
     } else if (operationObjectType === 'column') {
-        let column_name = operationObject.find('.column__name').text();
-
-        storage = modelModule.removeObject(storage, column_name, false, 'column');
+        storage = modelModule.removeObject(column_index, false, operationObjectType);
     }
     drawModule.draw(storage);
     popupToggle('popup__editing-object', close_bg = true);
@@ -260,10 +267,9 @@ function createNewColumn(event) {
     let new_column_name = $(this).find('input[id="add_column_field"]').val();
 
     if (new_column_name) {
-        storage = modelModule.addObject(storage, new_column_name, false, 'column');
-        $(this).find('input[id="add_column_field"]').val('');
+        storage = modelModule.addObject(new_column_name, 'column', false);
         drawModule.draw(storage);
     }
-
+    $(this).find('input[id="add_column_field"]').val('');
     displayNameNewColumnForm();
 }

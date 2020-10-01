@@ -234,6 +234,10 @@ body {
     cursor: pointer;
 }
 
+.card_found {
+    background: gold!important;
+}
+
 .card:hover {
     background: lightgray;
 }
