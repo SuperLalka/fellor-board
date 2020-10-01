@@ -51,7 +51,7 @@ body {
     width: 100px;
 }
 
-.header__search-input:focus {
+.header__search-input_focus {
     background-color: white;
     color: black;
     width: 250px;
