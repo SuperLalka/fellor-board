@@ -46,6 +46,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Удаление объекта
     $("button.actions__delete-button").on('click', removeObject);
 
+    // Преображает форму ввода комментария
+    $(".comments-form__input").on('focus', focusInputComment);
+
+    // Обработка формы добавления нового комментария
+    $(".comments-block > .comments-form").on('submit', addComment);
+
     // Универсальная кнопка закрытия pop-up'a
     $(".popup__close-button").on('click', function () {
         popupToggle($(this).closest('div').attr("class"), close_bg = true)
@@ -58,6 +64,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // Обработка формы ввода имени и создание новой колонки
     $(".add-column > .add-column__form").on('submit', createNewColumn);
 
+    // Открытие главной страницы со списком досок
+    $(".header > .header__home-page").on('click', openHomePage);
+
+    // Pop-up добавления новой доски
+    $(".boards > .boards__add-board").on('click', popupAddBoard);
+
+    // Обработка формы ввода имени и создание новой доски
+    $(".popup__add-board > .add-board-form").on('submit', createNewBoard);
+
+    // Открытие выбранной доски
+    $(".boards__items-list > .boards__item").on('click', openBoard);
+
 });
 
 
@@ -66,7 +84,7 @@ function searchByCards() {
     let key = $(this).val().toLowerCase();
 
     if (key) {
-        let storage = modelModule.getStorage();
+        let storage = modelModule.getCurrentBoard();
         let results_storage = [];
         for (let column in storage) {
             results_storage.push(new Map([
@@ -93,7 +111,7 @@ function searchByCards() {
 }
 
 
-// Функция поиска по названиям карт
+// Функция преобразования формы поиска по названиям карт
 function focusSearchByCards() {
     $(".header__search-input").addClass('header__search-input_focus');
 }
@@ -104,7 +122,7 @@ function resetSearchInput() {
     $(".header__search-input").removeClass('header__search-input_focus');
     $('.header__search-reset').css({"visibility": "hidden"});
     $(this).siblings('input[id="search_field"]').val('');
-    drawModule.draw(modelModule.getStorage());
+    drawModule.draw(modelModule.getCurrentBoard());
 }
 
 
@@ -148,7 +166,7 @@ function addCardFormProcessing(event) {
 
     if (new_card_name) {
         modelModule.addObject(new_card_name, 'card', column_index);
-        drawModule.draw(modelModule.getStorage());
+        drawModule.draw(modelModule.getCurrentBoard());
     }
     $(this).find('input[id="add_card_field"]').val('');
     popupToggle('popup__add-card', close_bg = true);
@@ -161,6 +179,15 @@ export function openObject(object) {
     operationObjectType = object.attr('data-object-type');
     popupToggle('popup__editing-object', close_bg = true);
     $(".object-block__title").text($(object).attr('data-object-name'));
+
+    if (operationObjectType === 'card') {
+        let column_index = ($(operationObject)).attr('data-column-id');
+        let card_index = ($(operationObject)).attr('data-card-id');
+        let card_comments;
+
+        card_comments = modelModule.getCardsComments(column_index, card_index);
+        drawModule.drawComments(card_comments);
+    }
 }
 
 
@@ -180,18 +207,18 @@ function toggleRenameForm() {
 
             modelModule.renameObject(column_index, card_index, operationObjectType, new_name);
             $(form).find('input[id="object_rename_field"]').val('');
-            drawModule.draw(modelModule.getStorage());
+            drawModule.draw(modelModule.getCurrentBoard());
         }
 
         $(this).siblings('.object-block__title').css({"display": "block"});
         $(this).siblings('.object-block__rename-form').css({"display": "none"});
         waitingForRenaming = false;
-        // openObject($(operationObject), 'card')
+        // openObject(operationObject);
     }
 }
 
 
-// Функция вызова pop-up'a окна перемещения объекта
+// Функция вызова pop-up'a окна перемещения/копирования объекта
 function moveObject() {
     $(".popup__additional-settings").css({"display": "block"}).append(
         $('<div>', {'class': 'additional-settings__block'}));
@@ -220,7 +247,7 @@ function columnToMoveObject() {
         modelModule.moveObject(column_index, new_column_index, card_index, operationObjectType);
     }
 
-    drawModule.draw(modelModule.getStorage());
+    drawModule.draw(modelModule.getCurrentBoard());
     $(".additional-settings__block").remove();
     popupToggle('popup__additional-settings', close_bg = true);
 }
@@ -232,7 +259,7 @@ function copyObject() {
     let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
 
     modelModule.copyObject(column_index, card_index, operationObjectType);
-    drawModule.draw(modelModule.getStorage());
+    drawModule.draw(modelModule.getCurrentBoard());
     popupToggle('popup__editing-object', close_bg = true);
 }
 
@@ -243,8 +270,31 @@ function removeObject() {
     let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
 
     modelModule.removeObject(column_index, card_index, operationObjectType);
-    drawModule.draw(modelModule.getStorage());
+    drawModule.draw(modelModule.getCurrentBoard());
     popupToggle('popup__editing-object', close_bg = true);
+}
+
+
+// Функция преобразования формы ввода комментария
+function focusInputComment() {
+    $("#comment_field").toggleClass('comments-form__input_focus');
+    $(".comments-form__submit-button").toggle();
+}
+
+
+// Функция обработки формы ввода комментария
+function addComment(event) {
+    event.preventDefault();
+    let comment_text = $(this).find('textarea[id="comment_field"]').val();
+    let column_index = ($(operationObject)).attr('data-column-id');
+    let card_index = ($(operationObject)).attr('data-card-id');
+
+    if (comment_text) {
+        modelModule.addComment(column_index, card_index, comment_text);
+        drawModule.draw(modelModule.getCurrentBoard());
+    }
+    $(this).find('textarea[id="comment_field"]').val('');
+    focusInputComment();
 }
 
 
@@ -262,8 +312,50 @@ function createNewColumn(event) {
 
     if (new_column_name) {
         modelModule.addObject(new_column_name, 'column', false);
-        drawModule.draw(modelModule.getStorage());
+        drawModule.draw(modelModule.getCurrentBoard());
     }
     $(this).find('input[id="add_column_field"]').val('');
     displayNameNewColumnForm();
+}
+
+
+// Функция показа главной страницы и отрисовки списка досок
+function openHomePage() {
+    $('main.table').css({"visibility": "hidden", "display": "none"});
+    $('main.board-selection').css({"visibility": "visible", "display": "block"});
+
+    drawModule.drawHomepage(modelModule.getStorage())
+}
+
+
+// Функция создания новой доски
+function popupAddBoard() {
+    popupToggle('popup__add-board', close_bg = true);
+}
+
+
+// Функция обработки формы ввода имени и создания новой доски
+function createNewBoard(event) {
+    event.preventDefault();
+    let new_board_name = $(this).find('input[id="add_board_field"]').val();
+
+    if (new_board_name) {
+        modelModule.addBoard(new_board_name);
+        drawModule.drawHomepage(modelModule.getStorage())
+    }
+    $(this).find('input[id="add_board_field"]').val('');
+    popupToggle('popup__add-board', close_bg = true);
+}
+
+// Функция отрисоки доски
+export function openBoard() {
+    let board_name = $(this).attr('data-board-name');
+    let current_board = $(this).attr('data-board-id');
+    modelModule.setCurrentBoard(current_board)
+    drawModule.draw(modelModule.getCurrentBoard());
+
+    $('.header > .header__search-form').css({"visibility": "visible"});
+    $('.info-block__table-name').text(board_name);
+    $('main.table').css({"visibility": "visible", "display": "block"});
+    $('main.board-selection').css({"visibility": "hidden", "display": "none"});
 }

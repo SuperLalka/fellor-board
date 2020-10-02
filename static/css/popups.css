@@ -36,7 +36,8 @@
 
 .popup__customization,
 .popup__add-card,
-.popup__editing-object {
+.popup__editing-object,
+.popup__add-board {
     background-color: white;
     border-radius: 10px;
     display: none;
@@ -46,7 +47,8 @@
 }
 
 .customization-form,
-.add-card-form {
+.add-card-form,
+.add-board-form {
     padding: 20px;
 }
 
@@ -141,6 +143,87 @@
 
 .object-block__information {
     width: 75%;
+}
+
+.information {
+
+}
+
+.information__description {
+}
+
+.information__description-title {
+    border-bottom: 1px solid;
+    margin: 0 20px 15px 20px;
+}
+
+.information__comments-block {
+
+}
+
+.comments-block {
+
+}
+
+.comments-block__title {
+    border-bottom: 1px solid;
+    margin: 0 20px 15px 20px;
+}
+
+.comments-block__comments-form {
+    margin: 0 20px;
+}
+
+.comments-form {
+    position: relative;
+}
+
+.comments-form__input {
+    height: 15px;
+    max-height: 100px;
+    min-height: 15px;
+    padding: 5px;
+    transition: .5s;
+    resize: vertical;
+    width: calc(100% - 10px);
+}
+
+.comments-form__input_focus {
+    height: 60px;
+}
+
+.comments-form__submit-button {
+    background-color: aliceblue;
+    border-style: dashed;
+    bottom: -25px;
+    cursor: pointer;
+    display: none;
+    font-size: 12px;
+    outline: none;
+    padding: 5px;
+    position: absolute;
+    transition: .4s;
+    width: 160px;
+}
+
+.comments-form__submit-button:hover {
+    background-color: black;
+    border-style: solid;
+    color: white;
+}
+
+.comments-block__list-comments {
+    list-style: none;
+    margin: 30px 20px;
+    padding: 0;
+}
+
+.comments-block__comment {
+    border: 1px solid;
+    margin: 7px 0;
+    min-height: 50px;
+    overflow-wrap: break-word;
+    padding: 5px;
 }
 
 .object-block__actions {

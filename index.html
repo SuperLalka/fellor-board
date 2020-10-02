@@ -10,59 +10,6 @@
 
 </head>
 <body>
-<!-- popups -->
-<div class="background-popup">
-  <div class="popup__customization">
-    <h2 class="popup__title">Кастомизация</h2>
-    <i class="popup__close-button">&#10006;</i>
-    <form class="popup__form customization-form">
-      <div class="popup__form-block">
-        <label class="popup__label popup__label_big" for="name_field">Настройка названия доски</label>
-        <input class="popup__input" id="name_field" type="text" placeholder="например: Fellor-board">
-        <label class="popup__label popup__label_big" for="bgcolor_field">Настройка цвета фона (HEX)</label>
-        <input class="popup__input" id="bgcolor_field" type="text" placeholder="например: #000000 или orange">
-        <button type="submit" class="popup__submit-button">Сменить</button>
-      </div>
-    </form>
-  </div>
-  <div class="popup__add-card">
-    <h2 class="popup__title">Добавить карточку</h2>
-    <i class="popup__close-button">&#10006;</i>
-    <form class="popup__form add-card-form" action="#" method="get">
-      <div class="popup__form-block">
-        <label class="popup__label" for="add_card_field">Название для новой карточки</label>
-        <input class="popup__input" id="add_card_field" type="text">
-        <button type="submit" class="popup__submit-button">Создать</button>
-      </div>
-    </form>
-  </div>
-  <div class="popup__editing-object">
-    <h2 class="popup__title">Редактировать</h2>
-    <i class="popup__close-button">&#10006;</i>
-    <div class="popup__object-block object-block">
-      <h3 class="object-block__title"></h3>
-      <form class="popup__form object-block__rename-form" action="#" method="get">
-        <div class="popup__form-block">
-          <label class="popup__label" for="object_rename_field"></label>
-          <input class="popup__input popup__input_lower-border" id="object_rename_field" type="text">
-        </div>
-      </form>
-      <i class="object-block__title-editing">&#9998;</i>
-      <div class="object-block__object">
-        <div class="object-block__information">
-        </div>
-        <div class="object-block__actions actions">
-          <button class="actions__move-button">Переместить</button>
-          <button class="actions__copy-button">Копировать</button>
-          <button class="actions__delete-button">Удалить</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="popup__additional-settings additional-settings">
-  </div>
-</div>
-<!-- popups end -->
 <!-- header -->
 <header class="header">
   <a class="header__home-page" href="#">Home</a>
@@ -73,7 +20,7 @@
   <h2 class="header__title">Fellor</h2>
 </header>
 <!-- header end -->
-<!-- main -->
+<!-- main table -->
 <main class="table">
   <div class="table__info-block info-block">
     <div class="info-block__table-name">Название доски</div>
@@ -93,8 +40,105 @@
       </form>
     </div>
   </div>
+  <!-- popups -->
+  <div class="background-popup">
+    <div class="popup__customization">
+      <h2 class="popup__title">Кастомизация</h2>
+      <i class="popup__close-button">&#10006;</i>
+      <form class="popup__form customization-form">
+        <div class="popup__form-block">
+          <label class="popup__label popup__label_big" for="name_field">Настройка названия доски</label>
+          <input class="popup__input" id="name_field" type="text" placeholder="например: Fellor-board">
+          <label class="popup__label popup__label_big" for="bgcolor_field">Настройка цвета фона (HEX)</label>
+          <input class="popup__input" id="bgcolor_field" type="text" placeholder="например: #000000 или orange">
+          <button type="submit" class="popup__submit-button">Сменить</button>
+        </div>
+      </form>
+    </div>
+    <div class="popup__add-card">
+      <h2 class="popup__title">Добавить карточку</h2>
+      <i class="popup__close-button">&#10006;</i>
+      <form class="popup__form add-card-form" action="#" method="get">
+        <div class="popup__form-block">
+          <label class="popup__label" for="add_card_field">Название для новой карточки</label>
+          <input class="popup__input" id="add_card_field" type="text">
+          <button type="submit" class="popup__submit-button">Создать</button>
+        </div>
+      </form>
+    </div>
+    <div class="popup__editing-object">
+      <h2 class="popup__title">Редактировать</h2>
+      <i class="popup__close-button">&#10006;</i>
+      <div class="popup__object-block object-block">
+        <h3 class="object-block__title"></h3>
+        <form class="popup__form object-block__rename-form" action="#" method="get">
+          <div class="popup__form-block">
+            <label class="popup__label" for="object_rename_field"></label>
+            <input class="popup__input popup__input_lower-border" id="object_rename_field" type="text">
+          </div>
+        </form>
+        <i class="object-block__title-editing">&#9998;</i>
+        <div class="object-block__object">
+          <div class="object-block__information information">
+            <div class="information__description">
+              <h2 class="information__description-title">Описание</h2>
+            </div>
+            <div class="information__comments-block comments-block">
+              <h2 class="comments-block__title">Комментарии</h2>
+              <form class="comments-block__comments-form comments-form">
+                <textarea class="comments-form__input" id="comment_field" placeholder="Введите комментарий"></textarea>
+                <button class="comments-form__submit-button" type="submit">Отправить комментарий</button>
+              </form>
+              <ul class="comments-block__list-comments"></ul>
+            </div>
+          </div>
+          <div class="object-block__actions actions">
+            <button class="actions__move-button">Переместить</button>
+            <button class="actions__copy-button">Копировать</button>
+            <button class="actions__delete-button">Удалить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup__additional-settings additional-settings"></div>
+  </div>
+  <!-- popups end -->
 </main>
-<!-- main end -->
+<!-- main table end -->
+<!-- main board selection -->
+<main class="board-selection">
+  <div class="board-selection-block">
+    <div class="sidebar-container sidebar">
+      <ul class="sidebar__items-list">
+        <li class="sidebar__item">Доски</li>
+        <li class="sidebar__item">Шаблоны</li>
+        <li class="sidebar__item">Главная страница</li>
+      </ul>
+    </div>
+    <div class="boards-container boards">
+      <ul class="boards__items-list"></ul>
+      <div class="boards__add-board">
+        Создать доску
+      </div>
+    </div>
+  </div>
+  <!-- popups -->
+  <div class="background-popup">
+    <div class="popup__add-board">
+      <h2 class="popup__title">Добавить колонку</h2>
+      <i class="popup__close-button">&#10006;</i>
+      <form class="popup__form add-board-form" action="#" method="get">
+        <div class="popup__form-block">
+          <label class="popup__label" for="add_board_field">Название для новой доски</label>
+          <input class="popup__input" id="add_board_field" type="text">
+          <button type="submit" class="popup__submit-button">Создать</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- popups end -->
+</main>
+<!-- main board selection end -->
 </body>
 <script type="module" src="static/js/draw.js"></script>
 <script type="module" src="static/js/model.js"></script>
