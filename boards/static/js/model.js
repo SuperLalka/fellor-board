@@ -111,7 +111,7 @@ export function addComment(column_index, card_index, comment_text) {
     let element = current_board[column_index].get('cards')[card_index];
 
     if (element.comments) {
-        element.comments.push(comment_text);
+        element.comments.unshift(comment_text);
     } else {
         element.comments = [comment_text];
     }
