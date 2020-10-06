@@ -60,7 +60,7 @@
     <div class="popup__add-card">
       <h2 class="popup__title">Добавить карточку</h2>
       <i class="popup__close-button">&#10006;</i>
-      <form class="popup__form add-card-form" action="#" method="get">
+      <form class="popup__form add-card-form" method="post">
         <div class="popup__form-block">
           <label class="popup__label" for="add_card_field">Название для новой карточки</label>
           <input class="popup__input" id="add_card_field" type="text">
@@ -73,7 +73,7 @@
       <i class="popup__close-button">&#10006;</i>
       <div class="popup__object-block object-block">
         <h3 class="object-block__title"></h3>
-        <form class="popup__form object-block__rename-form" action="#" method="get">
+        <form class="popup__form object-block__rename-form" method="patch">
           <div class="popup__form-block">
             <label class="popup__label" for="object_rename_field"></label>
             <input class="popup__input popup__input_lower-border" id="object_rename_field" type="text">

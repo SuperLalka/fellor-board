@@ -77,7 +77,6 @@ body {
 }
 
 .table {
-    background-color: #2797cb;
     display: none;
     overflow: auto;
 }
@@ -309,12 +308,13 @@ body {
 .boards__item,
 .boards__add-board {
     align-items: center;
-    border: 1px solid;
+    border: 2px solid;
     cursor: pointer;
     display: flex;
     justify-content: center;
     height: 75px;
     margin: 5px;
+    transition: .4s;
     width: 150px;
 }
 
@@ -324,8 +324,11 @@ body {
     transition: .5s;
 }
 
+.boards__item:hover,
 .boards__add-board:hover {
-    background-color: white;
+    background-color: white!important;
+    border-style: dotted;
+    font-size: 20px;
 }
 
 .boards__add-board-text {
