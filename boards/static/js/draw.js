@@ -4,18 +4,20 @@ var newColumn;
 
 
 // Функция отрисовки списка досок главной страницы
-export function drawHomepage(storage) {
+export function drawHomepage(list_boards) {
     let boards_block = $('.boards > .boards__items-list');
     boards_block.empty();
-    for (let board in storage) {
+    for (let board in list_boards) {
         let board_object = $('<li>', {
-            'text': storage[board].board_name,
+            'text': list_boards[board]['name'],
             'class': 'boards__item'
         });
 
+        board_object.css("background", list_boards[board]['bg_color'])
+
         board_object.attr({
-            "data-board-id": board,
-            "data-board-name": storage[board].board_name
+            "data-board-id": list_boards[board]['id'],
+            "data-board-name": list_boards[board]['name']
         });
         board_object.on('click', controlModule.openBoard);
 
@@ -25,27 +27,45 @@ export function drawHomepage(storage) {
 
 
 // Функция отрисовки доски
-export function draw(storage) {
+export function draw(board_objects) {
     $('.table__list-columns').empty();
-    for (let column in storage) {
-        createColumn(storage[column].get('name'), column);
 
-        let cards = storage[column].get('cards');
-        if (cards) {
-            for (let card in cards) {
-                createCard(cards[card], column, card)
+    let board_columns = board_objects['board_columns'];
+    let board_cards = board_objects['board_cards'];
+    let board_bg_color = board_objects['board_bg_color'];
+
+    if (board_columns) {
+        for (let column in board_columns) {
+            createColumn(board_columns[column]);
+        }
+        if (board_cards) {
+            for (let card in board_cards) {
+                createCard(board_cards[card])
             }
         }
+    }
+    if (board_bg_color) {
+        $('.table').css('background-color', board_bg_color)
+    } else {
+        $('.table').css('background-color', 'cadetblue')
+    }
+}
+
+
+// Функция выделения карточек соответствующих запросу поиска
+export function drawSearchResults(results_storage) {
+    for (let card in results_storage) {
+        $(`.card[data-card-id="${results_storage[card].id}`).css('background', 'orange')
     }
 }
 
 
 // Отрисовка колонки
-function createColumn(name, column_index) {
+function createColumn(column_object) {
     newColumn = ($('<li>', {
         'class': 'table__column column'
     })).append($('<p>', {
-        'text': name,
+        'text': column_object.name,
         'class': 'column__name'
     })).append($('<i>', {
         'text': '...',
@@ -58,8 +78,8 @@ function createColumn(name, column_index) {
     }));
 
     newColumn.attr({
-        "data-column-id": column_index,
-        "data-object-name": name,
+        "data-column-id": column_object.id,
+        "data-object-name": column_object.name,
         "data-object-type": "column"
     });
     newColumn.find('.column__add-card').on('click', controlModule.popupAddCart);
@@ -71,22 +91,22 @@ function createColumn(name, column_index) {
 
 
 // Отрисовка карточки
-function createCard(card, column_index, card_index) {
+function createCard(card_object) {
     let newCard = $('<div>', {
-        'text': card.name,
+        'text': card_object.name,
         'class': 'column__card card'
     });
 
     newCard.on('click', function () {
         controlModule.openObject($(this))
     });
+
     newCard.attr({
-        "data-column-id": column_index,
-        "data-card-id": card_index,
-        "data-object-name": card.name,
+        "data-card-id": card_object.id,
+        "data-object-name": card_object.name,
         "data-object-type": "card"
     });
-    $(newColumn).find('.column__list-cards').append(newCard);
+    $(`.column[data-column-id="${card_object.column}"]`).find('.column__list-cards').append(newCard);
 }
 
 
@@ -96,8 +116,12 @@ export function drawComments(card_comments) {
     comments_block.empty();
     for (let comment in card_comments) {
         comments_block.append($('<li>', {
-            'text': card_comments[comment],
+            'text': card_comments[comment].text,
             'class': 'comments-block__comment'
         }));
+
+        comments_block.attr({
+            "data-comment-id": card_comments[comment].id
+        });
     }
 }

@@ -10,6 +10,8 @@ var waitingForRenaming;
 // Обработчик, когда DOM будет полностью загружен
 document.addEventListener("DOMContentLoaded", function () {
 
+    refreshMainPage()
+
     // Поиск по названиям карт
     $(".header__search-input").on('change', searchByCards);
     $("input.header__search-input").on('focus', focusSearchByCards);
@@ -84,27 +86,9 @@ function searchByCards() {
     let key = $(this).val().toLowerCase();
 
     if (key) {
-        let storage = modelModule.getCurrentBoard();
-        let results_storage = [];
-        for (let column in storage) {
-            results_storage.push(new Map([
-                ['name', storage[column].get('name')]
-            ]));
-            let cards = storage[column].get('cards');
-            if (cards) {
-                for (let card in cards) {
-                    if (cards[card].name.toLowerCase().includes(key)) {
-                        if (results_storage[column].has('cards')) {
-                            results_storage[column].get('cards').push({'name': cards[card].name});
-                        } else {
-                            results_storage[column].set('cards', [{'name': cards[card].name}]);
-                        }
-                    }
-                }
-            }
-        }
+        let results_storage = modelModule.searchCards(key);
         $('.header__search-reset').css({"visibility": "visible"});
-        drawModule.draw(results_storage);
+        drawModule.drawSearchResults(results_storage);
     } else {
         resetSearchInput();
     }
@@ -122,7 +106,7 @@ function resetSearchInput() {
     $(".header__search-input").removeClass('header__search-input_focus');
     $('.header__search-reset').css({"visibility": "hidden"});
     $(this).siblings('input[id="search_field"]').val('');
-    drawModule.draw(modelModule.getCurrentBoard());
+    refreshBoard();
 }
 
 
@@ -138,15 +122,18 @@ function popupToggle(popupName, close_bg) {
 // Функция обработки формы из pop-up'a кастомизации доски
 function customizationFormProcessing(event) {
     event.preventDefault();
-    let name_field = $(this).find('input[id="name_field"]').val();
-    let bgcolor_field = $(this).find('input[id="bgcolor_field"]').val();
+    let new_name = $(this).find('input[id="name_field"]').val();
+    let new_bg_color = $(this).find('input[id="bgcolor_field"]').val();
+    let update_attr = {}
 
-    if (name_field) {
-        $(".info-block__table-name").text(name_field);
+    if (new_name) {
+        update_attr['name'] = new_name;
     }
-    if (bgcolor_field) {
-        $(".table").css({"background-color": bgcolor_field});
+    if (new_bg_color) {
+        update_attr['bg_color'] = new_bg_color;
     }
+    console.log(update_attr)
+    modelModule.changeBoard(update_attr)
     popupToggle('popup__customization', close_bg = true);
 }
 
@@ -166,7 +153,7 @@ function addCardFormProcessing(event) {
 
     if (new_card_name) {
         modelModule.addObject(new_card_name, 'card', column_index);
-        drawModule.draw(modelModule.getCurrentBoard());
+        refreshBoard();
     }
     $(this).find('input[id="add_card_field"]').val('');
     popupToggle('popup__add-card', close_bg = true);
@@ -181,12 +168,13 @@ export function openObject(object) {
     $(".object-block__title").text($(object).attr('data-object-name'));
 
     if (operationObjectType === 'card') {
-        let column_index = ($(operationObject)).attr('data-column-id');
-        let card_index = ($(operationObject)).attr('data-card-id');
+        let card_id = ($(operationObject)).attr('data-card-id');
         let card_comments;
 
-        card_comments = modelModule.getCardsComments(column_index, card_index);
-        drawModule.drawComments(card_comments);
+        card_comments = modelModule.getCardsComments(card_id);
+        if (card_comments) {
+            drawModule.drawComments(card_comments);
+        }
     }
 }
 
@@ -202,12 +190,11 @@ function toggleRenameForm() {
         let new_name = form.find('input[id="object_rename_field"]').val();
 
         if (new_name) {
-            let column_index = operationObject.attr('data-column-id');
-            let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
+            let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-            modelModule.renameObject(column_index, card_index, operationObjectType, new_name);
+            modelModule.renameObject(object_id, operationObjectType, new_name);
             $(form).find('input[id="object_rename_field"]').val('');
-            drawModule.draw(modelModule.getCurrentBoard());
+            refreshBoard();
         }
 
         $(this).siblings('.object-block__title').css({"display": "block"});
@@ -240,14 +227,13 @@ function moveObject() {
 // Функция перемещения объекта
 function columnToMoveObject() {
     let new_column_index = $(this).attr('data-column-id');
-    let column_index = operationObject.attr('data-column-id');
+    let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-    if (new_column_index !== column_index) {
-        let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
-        modelModule.moveObject(column_index, new_column_index, card_index, operationObjectType);
+    if (new_column_index !== object_id) {
+        modelModule.changeObject(object_id, new_column_index, operationObjectType, 'move');
     }
 
-    drawModule.draw(modelModule.getCurrentBoard());
+    refreshBoard();
     $(".additional-settings__block").remove();
     popupToggle('popup__additional-settings', close_bg = true);
 }
@@ -255,22 +241,20 @@ function columnToMoveObject() {
 
 // Функция копирования объекта
 function copyObject() {
-    let column_index = operationObject.attr('data-column-id');
-    let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
+    let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-    modelModule.copyObject(column_index, card_index, operationObjectType);
-    drawModule.draw(modelModule.getCurrentBoard());
+    modelModule.changeObject(object_id, false, operationObjectType, 'copy');
+    refreshBoard();
     popupToggle('popup__editing-object', close_bg = true);
 }
 
 
 // Функция удаления объекта
 function removeObject() {
-    let column_index = operationObject.attr('data-column-id');
-    let card_index = (operationObjectType === 'card') ? operationObject.attr('data-card-id') : false;
+    let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-    modelModule.removeObject(column_index, card_index, operationObjectType);
-    drawModule.draw(modelModule.getCurrentBoard());
+    modelModule.removeObject(object_id, operationObjectType);
+    refreshBoard();
     popupToggle('popup__editing-object', close_bg = true);
 }
 
@@ -286,12 +270,11 @@ function focusInputComment() {
 function addComment(event) {
     event.preventDefault();
     let comment_text = $(this).find('textarea[id="comment_field"]').val();
-    let column_index = ($(operationObject)).attr('data-column-id');
-    let card_index = ($(operationObject)).attr('data-card-id');
+    let card_id = ($(operationObject)).attr('data-card-id');
 
     if (comment_text) {
-        modelModule.addComment(column_index, card_index, comment_text);
-        drawModule.draw(modelModule.getCurrentBoard());
+        modelModule.addComment(card_id, comment_text);
+        refreshBoard();
     }
     $(this).find('textarea[id="comment_field"]').val('');
     focusInputComment();
@@ -312,7 +295,7 @@ function createNewColumn(event) {
 
     if (new_column_name) {
         modelModule.addObject(new_column_name, 'column', false);
-        drawModule.draw(modelModule.getCurrentBoard());
+        refreshBoard();
     }
     $(this).find('input[id="add_column_field"]').val('');
     displayNameNewColumnForm();
@@ -324,11 +307,11 @@ function openHomePage() {
     $('main.table').css({"visibility": "hidden", "display": "none"});
     $('main.board-selection').css({"visibility": "visible", "display": "block"});
 
-    drawModule.drawHomepage(modelModule.getStorage())
+    refreshMainPage();
 }
 
 
-// Функция создания новой доски
+// Функция переключения видимости формы ввода имени новой доски
 function popupAddBoard() {
     popupToggle('popup__add-board', close_bg = true);
 }
@@ -341,21 +324,34 @@ function createNewBoard(event) {
 
     if (new_board_name) {
         modelModule.addBoard(new_board_name);
-        drawModule.drawHomepage(modelModule.getStorage())
+        refreshMainPage();
     }
     $(this).find('input[id="add_board_field"]').val('');
     popupToggle('popup__add-board', close_bg = true);
 }
+
 
 // Функция отрисоки доски
 export function openBoard() {
     let board_name = $(this).attr('data-board-name');
     let current_board = $(this).attr('data-board-id');
     modelModule.setCurrentBoard(current_board)
-    drawModule.draw(modelModule.getCurrentBoard());
+    refreshBoard();
 
     $('.header > .header__search-form').css({"visibility": "visible"});
     $('.info-block__table-name').text(board_name);
     $('main.table').css({"visibility": "visible", "display": "block"});
     $('main.board-selection').css({"visibility": "hidden", "display": "none"});
+}
+
+
+// Функция обновления страницы
+export function refreshBoard() {
+    drawModule.draw(modelModule.getBoardObjects());
+}
+
+
+// Функция обновления главной страницы
+export function refreshMainPage() {
+    drawModule.drawHomepage(modelModule.getAllBoards());
 }

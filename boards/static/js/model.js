@@ -1,10 +1,31 @@
-var storage = [];
+import * as controlModule from './scripts.js';
+
 var current_board_index;
 
 
-// Получить хранилище объектов целиком
-export function getStorage() {
-    return storage
+// Получить список досок
+export function getAllBoards() {
+    let request = new XMLHttpRequest();
+    request.open('GET', '/fellor-boards.ru/api/boards', false);
+    request.send(null);
+
+    if (request.status !== 200) {
+        console.log('Error');
+    }
+    return JSON.parse(request.responseText)['boards'];
+}
+
+
+// Добавить новую доску
+export function addBoard(board_name) {
+    $.ajax({
+        type: "POST",
+        url: "/fellor-boards.ru/api/boards",
+        data: {'board_name': board_name},
+        success: function () {
+            controlModule.refreshMainPage();
+        }
+    });
 }
 
 
@@ -14,114 +35,201 @@ export function setCurrentBoard(board_index) {
 }
 
 
-// Получить конкретную доску
-export function getCurrentBoard(current_board) {
-    let board = current_board_index ? current_board_index : 0;
-    return storage[board].content;
+// Получить объекты определённой доски
+export function getBoardObjects() {
+    let request = new XMLHttpRequest();
+    request.open('GET', `/fellor-boards.ru/api/boards/${current_board_index}`, false);
+    request.send(null);
+
+    if (request.status !== 200) {
+        console.log('Error');
+    }
+    return JSON.parse(request.responseText);
 }
 
 
-// Добавить новую доску
-export function addBoard(board_name) {
-    storage.push({'board_name': board_name, 'content': []});
-    return storage
+// Внести изменения в доску
+export function changeBoard(update_attr) {
+    $.ajax({
+        type: "POST",
+        url: `/fellor-boards.ru/api/boards/${current_board_index}`,
+        data: update_attr,
+        dataType: 'json',
+        success: function () {
+            controlModule.refreshBoard();
+        }
+    });
+}
+
+
+// Удалить доску
+export function removeBoard(board_id) {
+    $.ajax({
+        type: "DELETE",
+        url: `/fellor-boards.ru/api/boards/${board_id}`,
+        success: function () {
+            controlModule.refreshMainPage();
+        }
+    });
 }
 
 
 // Добавить объект
-export function addObject(object_name, object_type, column_index) {
-    let current_board = getCurrentBoard();
+export function addObject(object_name, object_type, column_id) {
     if (object_type === 'card') {
-        if (current_board[column_index].has('cards')) {
-            current_board[column_index].get('cards').push({'name': object_name});
-        } else {
-            current_board[column_index].set('cards', [{'name': object_name}]);
-        }
+        $.ajax({
+            type: "POST",
+            url: "/fellor-boards.ru/api/cards",
+            data: {'card_name': object_name, 'column_id': column_id},
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     } else if (object_type === 'column') {
-        let index = column_index ? column_index : current_board.length;
-        current_board.splice(index, 0, new Map([
-            ['name', object_name]
-        ]));
+        $.ajax({
+            type: "POST",
+            url: "/fellor-boards.ru/api/columns",
+            data: {'column_name': object_name, 'board_id': current_board_index},
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     }
-    return current_board
 }
 
 
 // Переименовать объект
-export function renameObject(column_index, card_index, object_type, new_name) {
-    let current_board = getCurrentBoard();
-    if (object_type === 'column') {
-        current_board[column_index].set('name', new_name);
-        return current_board
+export function renameObject(object_id, object_type, new_name) {
+    if (object_type === 'card') {
+        $.ajax({
+            type: "POST",
+            url: `/fellor-boards.ru/api/cards/${object_id}`,
+            data: {'new_name': new_name, 'card_id': object_id},
+            dataType: 'json',
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
+    } else if (object_type === 'column') {
+        $.ajax({
+            type: "POST",
+            url: `/fellor-boards.ru/api/columns/${object_id}`,
+            data: {'new_name': new_name, 'column_id': object_id},
+            dataType: 'json',
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     }
-    current_board[column_index].get('cards')[card_index].name = new_name;
-    return current_board
 }
 
 
-// Копировать объект
-export function copyObject(column_index, card_index, object_type) {
-    let current_board = getCurrentBoard();
-    if (object_type === 'column') {
-        let element = current_board[column_index];
-        current_board.splice(column_index + 1, 0, element);
-    } else if (object_type === 'card') {
-        let element = current_board[column_index].get('cards')[card_index];
-        current_board[column_index].get('cards').splice(card_index + 1, 0, element);
+// Копировать/переместить объект
+export function changeObject(object_id, new_column_id, object_type, operation) {
+    if (operation === 'copy') {
+        if (object_type === 'card') {
+            $.ajax({
+                type: "POST",
+                url: `/fellor-boards.ru/api/cards/change/${object_id}`,
+                data: {'object_id': object_id, 'operation': operation},
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        } else if (object_type === 'column') {
+            $.ajax({
+                type: "POST",
+                url: `/fellor-boards.ru/api/columns/change/${object_id}`,
+                data: {'object_id': object_id, 'operation': operation},
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        }
+    } else if (operation === 'move') {
+        if (object_type === 'card') {
+            $.ajax({
+                type: "POST",
+                url: `/fellor-boards.ru/api/cards/change/${object_id}`,
+                data: {'object_id': object_id, 'new_column_id': new_column_id, 'operation': operation},
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        } else if (object_type === 'column') {
+            $.ajax({
+                type: "POST",
+                url: `/fellor-boards.ru/api/columns/change/${object_id}`,
+                data: {'object_id': object_id, 'new_column_id': new_column_id, 'operation': operation},
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        }
     }
-    return current_board
-}
-
-
-// Переместить объект
-export function moveObject(old_column_index, new_column_index, card_index, object_type) {
-    let current_board = getCurrentBoard();
-
-    if (object_type === 'column') {
-        let element = current_board[old_column_index];
-        current_board.splice(old_column_index, 1);
-        current_board.splice(new_column_index, 0, element);
-    } else if (object_type === 'card') {
-        let old_column_cards = current_board[old_column_index].get('cards');
-        let element = old_column_cards[card_index].name;
-
-        old_column_cards.splice(card_index, 1);
-        addObject(element, object_type, new_column_index);
-    }
-    return current_board
 }
 
 
 // Удалить объект
-export function removeObject(column_index, card_index, object_type) {
-    let current_board = getCurrentBoard();
-
-    if (object_type === 'column') {
-        current_board.splice(column_index, 1);
-    } else if (object_type === 'card') {
-        current_board[column_index].get('cards').splice(card_index, 1);
+export function removeObject(object_id, object_type) {
+    if (object_type === 'card') {
+        $.ajax({
+            type: "DELETE",
+            url: `/fellor-boards.ru/api/cards/${object_id}`,
+            data: {'object_id': object_id},
+            dataType: 'json',
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
+    } else if (object_type === 'column') {
+        $.ajax({
+            type: "DELETE",
+            url: `/fellor-boards.ru/api/columns/${object_id}`,
+            data: {'object_id': object_id},
+            dataType: 'json',
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     }
-    return current_board
 }
 
 
 // Добавить комментарий к карточке
-export function addComment(column_index, card_index, comment_text) {
-    let current_board = getCurrentBoard();
-    let element = current_board[column_index].get('cards')[card_index];
-
-    if (element.comments) {
-        element.comments.unshift(comment_text);
-    } else {
-        element.comments = [comment_text];
-    }
+export function addComment(card_id, comment_text) {
+    $.ajax({
+        type: "POST",
+        url: `/fellor-boards.ru/api/cards/comments/${card_id}`,
+        data: {'card_id': card_id, 'comment_text': comment_text},
+        success: function () {
+            controlModule.refreshBoard();
+        }
+    });
 }
 
 
 // Получить комментарии карточки
-export function getCardsComments(column_index, card_index) {
-    let current_board = getCurrentBoard();
-    let element = current_board[column_index].get('cards')[card_index];
+export function getCardsComments(card_id) {
+    let request = new XMLHttpRequest();
+    request.open('GET', `/fellor-boards.ru/api/cards/comments/${card_id}`, false);
+    request.send(null);
 
-    return (element.comments) ? element.comments : false;
+    if (request.status !== 200) {
+        console.log('Error');
+    }
+    return JSON.parse(request.responseText)['comments'];
+}
+
+
+// Найти карточки по ключевому слову из поиска
+export function searchCards(key) {
+    let request = new XMLHttpRequest();
+    request.open('GET', `/fellor-boards.ru/api/cards/search/${key}`, false);
+    request.send(null);
+
+    if (request.status !== 200) {
+        console.log('Error');
+    }
+    return JSON.parse(request.responseText)['found_cards'];
 }
