@@ -12,6 +12,7 @@ class Boards(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Доска'
         verbose_name_plural = 'Доски'
 
@@ -38,6 +39,7 @@ class Cards(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Карточка'
         verbose_name_plural = 'Карточки'
 
