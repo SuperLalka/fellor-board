@@ -26,6 +26,7 @@ class Columns(models.Model):
         return self.name
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Колонка'
         verbose_name_plural = 'Колонки'
 
