@@ -6,7 +6,9 @@ var current_board_index;
 // Получить список досок
 export function getAllBoards() {
     let request = new XMLHttpRequest();
-    request.open('GET', '/fellor-boards.ru/api/boards', false);
+    request.open('GET',
+        '/api/boards',
+        false);
     request.send(null);
 
     if (request.status !== 200) {
@@ -20,7 +22,7 @@ export function getAllBoards() {
 export function addBoard(board_name) {
     $.ajax({
         type: "POST",
-        url: "/fellor-boards.ru/api/boards",
+        url: "/api/boards",
         data: {'board_name': board_name},
         success: function () {
             controlModule.refreshMainPage();
@@ -38,7 +40,9 @@ export function setCurrentBoard(board_index) {
 // Получить объекты определённой доски
 export function getBoardObjects() {
     let request = new XMLHttpRequest();
-    request.open('GET', `/fellor-boards.ru/api/boards/${current_board_index}`, false);
+    request.open('GET',
+        `/api/boards/${current_board_index}`,
+        false);
     request.send(null);
 
     if (request.status !== 200) {
@@ -52,7 +56,7 @@ export function getBoardObjects() {
 export function changeBoard(update_attr) {
     $.ajax({
         type: "POST",
-        url: `/fellor-boards.ru/api/boards/${current_board_index}`,
+        url: `/api/boards/${current_board_index}`,
         data: update_attr,
         dataType: 'json',
         success: function () {
@@ -66,7 +70,7 @@ export function changeBoard(update_attr) {
 export function removeBoard(board_id) {
     $.ajax({
         type: "DELETE",
-        url: `/fellor-boards.ru/api/boards/${board_id}`,
+        url: `/api/boards/${board_id}`,
         success: function () {
             controlModule.refreshMainPage();
         }
@@ -75,92 +79,107 @@ export function removeBoard(board_id) {
 
 
 // Добавить объект
-export function addObject(object_name, object_type, column_id) {
+export function addObject(object_name, object_type, object_id, column_id, operation) {
     if (object_type === 'card') {
-        $.ajax({
-            type: "POST",
-            url: "/fellor-boards.ru/api/cards",
-            data: {'card_name': object_name, 'column_id': column_id},
-            success: function () {
-                controlModule.refreshBoard();
-            }
-        });
-    } else if (object_type === 'column') {
-        $.ajax({
-            type: "POST",
-            url: "/fellor-boards.ru/api/columns",
-            data: {'column_name': object_name, 'board_id': current_board_index},
-            success: function () {
-                controlModule.refreshBoard();
-            }
-        });
-    }
-}
-
-
-// Переименовать объект
-export function renameObject(object_id, object_type, new_name) {
-    if (object_type === 'card') {
-        $.ajax({
-            type: "POST",
-            url: `/fellor-boards.ru/api/cards/${object_id}`,
-            data: {'new_name': new_name, 'card_id': object_id},
-            dataType: 'json',
-            success: function () {
-                controlModule.refreshBoard();
-            }
-        });
-    } else if (object_type === 'column') {
-        $.ajax({
-            type: "POST",
-            url: `/fellor-boards.ru/api/columns/${object_id}`,
-            data: {'new_name': new_name, 'column_id': object_id},
-            dataType: 'json',
-            success: function () {
-                controlModule.refreshBoard();
-            }
-        });
-    }
-}
-
-
-// Копировать/переместить объект
-export function changeObject(object_id, new_column_id, object_type, operation) {
-    if (operation === 'copy') {
-        if (object_type === 'card') {
+        if (operation === 'add') {
             $.ajax({
                 type: "POST",
-                url: `/fellor-boards.ru/api/cards/change/${object_id}`,
-                data: {'object_id': object_id, 'operation': operation},
+                url: "/api/cards",
+                data: {
+                    'card_name': object_name,
+                    'column_id': column_id,
+                    'operation': operation
+                },
                 success: function () {
                     controlModule.refreshBoard();
                 }
             });
-        } else if (object_type === 'column') {
+        } else if (operation === 'copy') {
             $.ajax({
                 type: "POST",
-                url: `/fellor-boards.ru/api/columns/change/${object_id}`,
-                data: {'object_id': object_id, 'operation': operation},
+                url: `/api/cards`,
+                data: {
+                    'card_id': object_id,
+                    'operation': operation
+                },
                 success: function () {
                     controlModule.refreshBoard();
                 }
             });
         }
-    } else if (operation === 'move') {
-        if (object_type === 'card') {
+    } else if (object_type === 'column') {
+        if (operation === 'add') {
             $.ajax({
                 type: "POST",
-                url: `/fellor-boards.ru/api/cards/change/${object_id}`,
-                data: {'object_id': object_id, 'new_column_id': new_column_id, 'operation': operation},
+                url: "/api/columns",
+                data: {
+                    'column_name': object_name,
+                    'board_id': current_board_index,
+                    'operation': operation
+                },
                 success: function () {
                     controlModule.refreshBoard();
                 }
             });
-        } else if (object_type === 'column') {
+        } else if (operation === 'copy') {
             $.ajax({
                 type: "POST",
-                url: `/fellor-boards.ru/api/columns/change/${object_id}`,
-                data: {'object_id': object_id, 'new_column_id': new_column_id, 'operation': operation},
+                url: `/api/columns`,
+                data: {
+                    'column_id': object_id,
+                    'operation': operation
+                },
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        }
+    }
+}
+
+
+// Изменить объект
+export function changeObject(object_id, object_type, changes, operation) {
+    if (object_type === 'card') {
+        if (operation === 'rename') {
+            $.ajax({
+                type: "POST",
+                url: `/api/cards/${object_id}`,
+                data: {
+                    'card_id': object_id,
+                    ...changes,
+                    'operation': operation
+                },
+                dataType: 'json',
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        } else if (operation === 'move') {
+            $.ajax({
+                type: "POST",
+                url: `/api/cards/${object_id}`,
+                data: {
+                    'object_id': object_id,
+                    ...changes,
+                    'operation': operation
+                },
+                success: function () {
+                    controlModule.refreshBoard();
+                }
+            });
+        }
+    } else if (object_type === 'column') {
+        if (operation === 'rename') {
+            $.ajax({
+                type: "POST",
+                url: `/api/columns/${object_id}`,
+                data: {
+                    'column_id': object_id,
+                    ...changes,
+                    'operation': operation
+                },
+                dataType: 'json',
                 success: function () {
                     controlModule.refreshBoard();
                 }
@@ -175,7 +194,7 @@ export function removeObject(object_id, object_type) {
     if (object_type === 'card') {
         $.ajax({
             type: "DELETE",
-            url: `/fellor-boards.ru/api/cards/${object_id}`,
+            url: `/api/cards/${object_id}`,
             data: {'object_id': object_id},
             dataType: 'json',
             success: function () {
@@ -185,7 +204,7 @@ export function removeObject(object_id, object_type) {
     } else if (object_type === 'column') {
         $.ajax({
             type: "DELETE",
-            url: `/fellor-boards.ru/api/columns/${object_id}`,
+            url: `/api/columns/${object_id}`,
             data: {'object_id': object_id},
             dataType: 'json',
             success: function () {
@@ -200,8 +219,11 @@ export function removeObject(object_id, object_type) {
 export function addComment(card_id, comment_text) {
     $.ajax({
         type: "POST",
-        url: `/fellor-boards.ru/api/cards/comments/${card_id}`,
-        data: {'card_id': card_id, 'comment_text': comment_text},
+        url: `/api/cards/comments/${card_id}`,
+        data: {
+            'card_id': card_id,
+            'comment_text': comment_text
+        },
         success: function () {
             controlModule.refreshBoard();
         }
@@ -212,7 +234,9 @@ export function addComment(card_id, comment_text) {
 // Получить комментарии карточки
 export function getCardsComments(card_id) {
     let request = new XMLHttpRequest();
-    request.open('GET', `/fellor-boards.ru/api/cards/comments/${card_id}`, false);
+    request.open('GET',
+        `/api/cards/comments/${card_id}`,
+        false);
     request.send(null);
 
     if (request.status !== 200) {
@@ -225,7 +249,9 @@ export function getCardsComments(card_id) {
 // Найти карточки по ключевому слову из поиска
 export function searchCards(key) {
     let request = new XMLHttpRequest();
-    request.open('GET', `/fellor-boards.ru/api/cards/search/${key}`, false);
+    request.open('GET',
+        `/api/cards/search/${key}`,
+        false);
     request.send(null);
 
     if (request.status !== 200) {

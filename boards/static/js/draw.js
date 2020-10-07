@@ -54,6 +54,7 @@ export function draw(board_objects) {
 
 // Функция выделения карточек соответствующих запросу поиска
 export function drawSearchResults(results_storage) {
+    $('.card').css('background', 'none')
     for (let card in results_storage) {
         $(`.card[data-card-id="${results_storage[card].id}`).css('background', 'orange')
     }
@@ -115,7 +116,7 @@ export function drawComments(card_comments) {
     let comments_block = $('.comments-block__list-comments');
     comments_block.empty();
     for (let comment in card_comments) {
-        comments_block.append($('<li>', {
+        comments_block.prepend($('<li>', {
             'text': card_comments[comment].text,
             'class': 'comments-block__comment'
         }));

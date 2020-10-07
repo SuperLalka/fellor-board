@@ -128,11 +128,11 @@ function customizationFormProcessing(event) {
 
     if (new_name) {
         update_attr['name'] = new_name;
+        $('.info-block__table-name').text(new_name);
     }
     if (new_bg_color) {
         update_attr['bg_color'] = new_bg_color;
     }
-    console.log(update_attr)
     modelModule.changeBoard(update_attr)
     popupToggle('popup__customization', close_bg = true);
 }
@@ -152,9 +152,9 @@ function addCardFormProcessing(event) {
     let column_index = ($(operationObject)).attr('data-column-id');
 
     if (new_card_name) {
-        modelModule.addObject(new_card_name, 'card', column_index);
-        refreshBoard();
+        modelModule.addObject(new_card_name, 'card', false, column_index, 'add');
     }
+
     $(this).find('input[id="add_card_field"]').val('');
     popupToggle('popup__add-card', close_bg = true);
 }
@@ -192,15 +192,18 @@ function toggleRenameForm() {
         if (new_name) {
             let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-            modelModule.renameObject(object_id, operationObjectType, new_name);
+            modelModule.changeObject(
+                object_id,
+                operationObjectType,
+                {'new_name': new_name},
+                'rename'
+            );
             $(form).find('input[id="object_rename_field"]').val('');
-            refreshBoard();
         }
 
-        $(this).siblings('.object-block__title').css({"display": "block"});
+        $(this).siblings('.object-block__title').css({"display": "block"}).text(new_name);
         $(this).siblings('.object-block__rename-form').css({"display": "none"});
         waitingForRenaming = false;
-        // openObject(operationObject);
     }
 }
 
@@ -230,10 +233,15 @@ function columnToMoveObject() {
     let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
     if (new_column_index !== object_id) {
-        modelModule.changeObject(object_id, new_column_index, operationObjectType, 'move');
+        modelModule.changeObject(
+            object_id,
+            operationObjectType,
+            {'column_id': new_column_index},
+            'move'
+        );
     }
 
-    refreshBoard();
+    refreshBoard(); // ?
     $(".additional-settings__block").remove();
     popupToggle('popup__additional-settings', close_bg = true);
 }
@@ -243,8 +251,8 @@ function columnToMoveObject() {
 function copyObject() {
     let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
-    modelModule.changeObject(object_id, false, operationObjectType, 'copy');
-    refreshBoard();
+    modelModule.addObject(false, operationObjectType, object_id, false, 'copy');
+    refreshBoard(); // ?
     popupToggle('popup__editing-object', close_bg = true);
 }
 
@@ -254,7 +262,6 @@ function removeObject() {
     let object_id = operationObject.attr(`data-${operationObjectType}-id`)
 
     modelModule.removeObject(object_id, operationObjectType);
-    refreshBoard();
     popupToggle('popup__editing-object', close_bg = true);
 }
 
@@ -274,10 +281,13 @@ function addComment(event) {
 
     if (comment_text) {
         modelModule.addComment(card_id, comment_text);
-        refreshBoard();
     }
     $(this).find('textarea[id="comment_field"]').val('');
     focusInputComment();
+
+    popupToggle('popup__editing-object', close_bg = true);
+    console.log($(`.card[data-card-id="${card_id}"]`))
+    openObject($(`.card[data-card-id="${card_id}"]`))
 }
 
 
@@ -294,8 +304,12 @@ function createNewColumn(event) {
     let new_column_name = $(this).find('input[id="add_column_field"]').val();
 
     if (new_column_name) {
-        modelModule.addObject(new_column_name, 'column', false);
-        refreshBoard();
+        modelModule.addObject(
+            new_column_name,
+            'column',
+            false,
+            false,
+            'add');
     }
     $(this).find('input[id="add_column_field"]').val('');
     displayNameNewColumnForm();
@@ -324,7 +338,6 @@ function createNewBoard(event) {
 
     if (new_board_name) {
         modelModule.addBoard(new_board_name);
-        refreshMainPage();
     }
     $(this).find('input[id="add_board_field"]').val('');
     popupToggle('popup__add-board', close_bg = true);
