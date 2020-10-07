@@ -79,112 +79,63 @@ export function removeBoard(board_id) {
 
 
 // Добавить объект
-export function addObject(object_name, object_type, object_id, column_id, operation) {
-    if (object_type === 'card') {
-        if (operation === 'add') {
-            $.ajax({
-                type: "POST",
-                url: "/api/cards",
-                data: {
-                    'card_name': object_name,
-                    'column_id': column_id,
-                    'operation': operation
-                },
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
-        } else if (operation === 'copy') {
-            $.ajax({
-                type: "POST",
-                url: `/api/cards`,
-                data: {
-                    'card_id': object_id,
-                    'operation': operation
-                },
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
+export function addCard(object_name, column_id) {
+    $.ajax({
+        type: "POST",
+        url: "/api/cards",
+        data: {
+            'name': object_name,
+            'column_id': column_id
+        },
+        success: function () {
+            controlModule.refreshBoard();
         }
-    } else if (object_type === 'column') {
-        if (operation === 'add') {
-            $.ajax({
-                type: "POST",
-                url: "/api/columns",
-                data: {
-                    'column_name': object_name,
-                    'board_id': current_board_index,
-                    'operation': operation
-                },
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
-        } else if (operation === 'copy') {
-            $.ajax({
-                type: "POST",
-                url: `/api/columns`,
-                data: {
-                    'column_id': object_id,
-                    'operation': operation
-                },
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
+    });
+}
+
+
+export function addColumn(object_name, object_id= false) {
+    $.ajax({
+        type: "POST",
+        url: "/api/columns",
+        data: {
+            'name': object_name,
+            'board_id': current_board_index,
+            'id': object_id
+        },
+        success: function () {
+            controlModule.refreshBoard();
         }
-    }
+    });
 }
 
 
 // Изменить объект
-export function changeObject(object_id, object_type, changes, operation) {
+export function changeObject(object_id, object_type, changes) {
     if (object_type === 'card') {
-        if (operation === 'rename') {
-            $.ajax({
-                type: "POST",
-                url: `/api/cards/${object_id}`,
-                data: {
-                    'card_id': object_id,
-                    ...changes,
-                    'operation': operation
-                },
-                dataType: 'json',
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
-        } else if (operation === 'move') {
-            $.ajax({
-                type: "POST",
-                url: `/api/cards/${object_id}`,
-                data: {
-                    'object_id': object_id,
-                    ...changes,
-                    'operation': operation
-                },
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
-        }
+        $.ajax({
+            type: "POST",
+            url: `/api/cards/${object_id}`,
+            data: {
+                'object_id': object_id,
+                ...changes
+            },
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     } else if (object_type === 'column') {
-        if (operation === 'rename') {
-            $.ajax({
-                type: "POST",
-                url: `/api/columns/${object_id}`,
-                data: {
-                    'column_id': object_id,
-                    ...changes,
-                    'operation': operation
-                },
-                dataType: 'json',
-                success: function () {
-                    controlModule.refreshBoard();
-                }
-            });
-        }
+        $.ajax({
+            type: "POST",
+            url: `/api/columns/${object_id}`,
+            data: {
+                'column_id': object_id,
+                ...changes
+            },
+            success: function () {
+                controlModule.refreshBoard();
+            }
+        });
     }
 }
 
@@ -222,7 +173,7 @@ export function addComment(card_id, comment_text) {
         url: `/api/cards/comments/${card_id}`,
         data: {
             'card_id': card_id,
-            'comment_text': comment_text
+            'text': comment_text
         },
         success: function () {
             controlModule.refreshBoard();

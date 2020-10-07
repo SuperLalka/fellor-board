@@ -152,7 +152,7 @@ function addCardFormProcessing(event) {
     let column_index = ($(operationObject)).attr('data-column-id');
 
     if (new_card_name) {
-        modelModule.addObject(new_card_name, 'card', false, column_index, 'add');
+        modelModule.addCard(new_card_name, column_index);
     }
 
     $(this).find('input[id="add_card_field"]').val('');
@@ -195,8 +195,7 @@ function toggleRenameForm() {
             modelModule.changeObject(
                 object_id,
                 operationObjectType,
-                {'new_name': new_name},
-                'rename'
+                {'name': new_name}
             );
             $(form).find('input[id="object_rename_field"]').val('');
         }
@@ -237,7 +236,6 @@ function columnToMoveObject() {
             object_id,
             operationObjectType,
             {'column_id': new_column_index},
-            'move'
         );
     }
 
@@ -249,9 +247,16 @@ function columnToMoveObject() {
 
 // Функция копирования объекта
 function copyObject() {
-    let object_id = operationObject.attr(`data-${operationObjectType}-id`)
+    let object_name = operationObject.attr('data-object-name')
 
-    modelModule.addObject(false, operationObjectType, object_id, false, 'copy');
+    if (operationObjectType === 'card') {
+        let column_id = $(operationObject).closest('.column').attr(`data-column-id`)
+        modelModule.addCard(object_name, column_id);
+    } else if (operationObjectType === 'column') {
+        let column_id = operationObject.attr('data-column-id')
+        modelModule.addColumn(object_name, column_id);
+    }
+
     refreshBoard(); // ?
     popupToggle('popup__editing-object', close_bg = true);
 }
@@ -286,7 +291,7 @@ function addComment(event) {
     focusInputComment();
 
     popupToggle('popup__editing-object', close_bg = true);
-    console.log($(`.card[data-card-id="${card_id}"]`))
+
     openObject($(`.card[data-card-id="${card_id}"]`))
 }
 
@@ -304,12 +309,7 @@ function createNewColumn(event) {
     let new_column_name = $(this).find('input[id="add_column_field"]').val();
 
     if (new_column_name) {
-        modelModule.addObject(
-            new_column_name,
-            'column',
-            false,
-            false,
-            'add');
+        modelModule.addColumn(new_column_name);
     }
     $(this).find('input[id="add_column_field"]').val('');
     displayNameNewColumnForm();
