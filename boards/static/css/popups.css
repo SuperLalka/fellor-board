@@ -224,6 +224,24 @@
     min-height: 50px;
     overflow-wrap: break-word;
     padding: 5px;
+    position: relative;
+}
+
+.comments-block__comment-delete {
+    border: none;
+    border-left: 1px solid;
+    cursor: pointer;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    transition: .3s;
+    right: 0;
+    width: 10%;
+}
+
+.comments-block__comment-delete:hover {
+    background-color: red;
+    font-size: 30px;
 }
 
 .object-block__actions {
