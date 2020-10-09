@@ -7,42 +7,26 @@ class BoardsApiTestCase(TestCase):
 
     def setUp(self):
         self.client = Client()
-
-    def test_get_boards_empty_list(self):
-        response = self.client.get('/api/boards')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"boards": []})
-
-    def test_get_boards_list(self):
-        board = Boards.objects.create(name='test')
-        response = self.client.get('/api/boards')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"boards": [{"id": board.id, "name": "test", "bg_color": "cadetblue"}]})
-
-    def test_create_board(self):
-        response = self.client.post('/api/boards', {'board_name': 'test'})
-        self.assertEqual(response.status_code, 201)
-
-
-class BoardsWithIDApiTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.test_board = Boards.objects.create(id=1, name='test')
+        self.test_board = Boards.objects.create(name='test')
 
     def test_get_board(self):
         response = self.client.get(f'/api/boards/{self.test_board.id}')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"board_columns": [], "board_cards": [], "board_bg_color": "cadetblue"})
+        self.assertEqual(response.json(), {'id': self.test_board.id, 'name': 'test', 'bg_color': 'cadetblue'})
 
-    def test_get_board_with_column(self):
-        self.test_board_column = Columns.objects.create(id=10, name='test_column', board_id=1)
-        response = self.client.get(f'/api/boards/{self.test_board.id}')
+    def test_get_boards_list(self):
+        Boards.objects.create(name='test_2')
+        response = self.client.get('/api/boards')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"board_columns": [{"id": 10, "name": "test_column"}], "board_cards": [],
-                                           "board_bg_color": "cadetblue"})
+        self.assertEqual(len(response.json()), 2)
 
-    def test_post_board_with_data(self):
-        response = self.client.post(f'/api/boards/{self.test_board.id}', {'name': 'lalka'})
+    def test_create_board(self):
+        response = self.client.post('/api/boards', {'name': 'test'})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {"id": 2, "name": "test", "bg_color": "cadetblue"})
+
+    def test_update_board(self):
+        response = self.client.patch(f'/api/boards/{self.test_board.id}', {'id': self.test_board.id, 'name': 'lalka'})
         self.assertEqual(response.status_code, 200)
         self.test_board.refresh_from_db()
         self.assertEqual(self.test_board.name, 'lalka')
@@ -61,11 +45,11 @@ class ColumnsApiTestCase(TestCase):
         self.test_column = Columns.objects.create(name='test_column', board_id=self.test_board.id)
 
     def test_create_column(self):
-        response = self.client.post('/api/columns', {'name': 'test_column', 'board_id': self.test_board.id, 'id': 'false'})
+        response = self.client.post('/api/columns', {'name': 'test_column', 'board_id': self.test_board.id})
         self.assertEqual(response.status_code, 201)
 
     def test_update_column(self):
-        response = self.client.post(f'/api/columns/{self.test_column.id}', {'name': 'new_name'})
+        response = self.client.patch(f'/api/columns/{self.test_column.id}', {'id': self.test_column.id, 'name': 'new_name'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Columns.objects.get(id=self.test_column.id).name, 'new_name')
 
@@ -84,12 +68,23 @@ class CardsApiTestCase(TestCase):
         self.test_card = Cards.objects.create(name='test_card', column=self.column)
 
     def test_create_card(self):
-        response = self.client.post('/api/cards',
-                                    {'name': 'new_card', 'column_id': self.column.id, 'operation': 'add'})
+        response = self.client.post('/api/cards', {'name': 'new_card', 'column_id': self.column.id, 'operation': 'add'})
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'id': 2, 'name': 'new_card', 'column_id': self.column.id, 'column': self.column.id})
+
+    def test_get_list_cards(self):
+        Cards.objects.create(name='test_card_2', column=self.column)
+        response = self.client.get('/api/cards')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+
+    def test_get_card(self):
+        response = self.client.get(f'/api/cards/{self.test_card.id}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'id': self.test_card.id, 'name': self.test_card.name, 'column_id': self.test_card.column_id, 'column': self.test_card.column_id})
 
     def test_update_card(self):
-        response = self.client.post(f'/api/cards/{self.test_card.id}', {'name': 'new_name'})
+        response = self.client.patch(f'/api/cards/{self.test_card.id}', {'id': self.test_card.id, 'name': 'new_name'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Cards.objects.get(id=self.test_card.id).name, 'new_name')
 
@@ -108,14 +103,15 @@ class CardsCommentsAPITestCase(TestCase):
         self.test_card = Cards.objects.create(name='test_card', column=self.column)
 
     def test_create_comment(self):
-        response = self.client.post(f'/api/cards/comments/{self.test_card.id}', {'text': 'comment_text'})
+        response = self.client.post(f'/api/comments', {'card_id': self.test_card.id, 'text': 'comment_text'})
         self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'card': self.test_card.id, 'card_id': self.test_card.id, 'id': 1, 'text': 'comment_text'})
 
     def test_get_comments_list(self):
         test_comment = Comments.objects.create(text='comment text', card_id=self.test_card.id)
-        response = self.client.get(f'/api/cards/comments/{self.test_card.id}')
+        response = self.client.get(f'/api/comments?card_id={self.test_card.id}')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'comments': [{'id': test_comment.id, 'text': 'comment text'}]})
+        self.assertEqual(response.json(), [{'id': test_comment.id, 'text': 'comment text', 'card_id': self.test_card.id, 'card': self.test_card.id}])
 
 
 class CardsSearchAPITestCase(TestCase):
@@ -132,6 +128,6 @@ class CardsSearchAPITestCase(TestCase):
         self.key = '123'
 
     def test_get_found_cards(self):
-        response = self.client.get(f'/api/cards/search/{self.key}')
+        response = self.client.get(f'/api/cards?search={self.key}')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['found_cards']), 2)
+        self.assertEqual(len(response.json()), 2)
