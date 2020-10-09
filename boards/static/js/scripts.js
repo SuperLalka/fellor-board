@@ -54,6 +54,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Обработка формы добавления нового комментария
     $(".comments-block > .comments-form").on('submit', addComment);
 
+    // Удаление комментария
+    $(".comments-block__comment > .comments-block__comment-delete").on('click', removeComment);
+
     // Универсальная кнопка закрытия pop-up'a
     $(".popup__close-button").on('click', function () {
         popupToggle($(this).closest('div').attr("class"), close_bg = true)
@@ -88,6 +91,7 @@ function searchByCards() {
     if (key) {
         let results_storage = modelModule.searchCards(key);
         $('.header__search-reset').css({"visibility": "visible"});
+
         drawModule.drawSearchResults(results_storage);
     } else {
         resetSearchInput();
@@ -129,11 +133,18 @@ function customizationFormProcessing(event) {
     if (new_name) {
         update_attr['name'] = new_name;
         $('.info-block__table-name').text(new_name);
+        $(this).find('input[id="name_field"]').val('');
     }
     if (new_bg_color) {
         update_attr['bg_color'] = new_bg_color;
+        $('.table').css('background-color', new_bg_color)
+        $(this).find('input[id="bgcolor_field"]').val('');
     }
-    modelModule.changeBoard(update_attr)
+    modelModule.changeObject(
+        false,
+        'board',
+        update_attr
+    );
     popupToggle('popup__customization', close_bg = true);
 }
 
@@ -291,8 +302,17 @@ function addComment(event) {
     focusInputComment();
 
     popupToggle('popup__editing-object', close_bg = true);
+    openObject($(operationObject))
+}
 
-    openObject($(`.card[data-card-id="${card_id}"]`))
+
+// Функция удаления комментария
+export function removeComment() {
+    let object_id = $(this).closest('.comments-block__comment').attr(`data-comment-id`)
+
+    modelModule.removeObject(object_id, 'comment');
+    popupToggle('popup__editing-object', close_bg = true);
+    openObject($(operationObject))
 }
 
 
@@ -344,13 +364,16 @@ function createNewBoard(event) {
 }
 
 
-// Функция отрисоки доски
+// Функция отрисовки доски
 export function openBoard() {
     let board_name = $(this).attr('data-board-name');
     let current_board = $(this).attr('data-board-id');
+    let board_bg = $(this).attr('data-board-bg-color');
+
     modelModule.setCurrentBoard(current_board)
     refreshBoard();
 
+    $('.table').css('background-color', board_bg)
     $('.header > .header__search-form').css({"visibility": "visible"});
     $('.info-block__table-name').text(board_name);
     $('main.table').css({"visibility": "visible", "display": "block"});
@@ -366,5 +389,5 @@ export function refreshBoard() {
 
 // Функция обновления главной страницы
 export function refreshMainPage() {
-    drawModule.drawHomepage(modelModule.getAllBoards());
+    drawModule.drawHomepage(modelModule.getListObjects('board'));
 }

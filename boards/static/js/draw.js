@@ -7,6 +7,7 @@ var newColumn;
 export function drawHomepage(list_boards) {
     let boards_block = $('.boards > .boards__items-list');
     boards_block.empty();
+
     for (let board in list_boards) {
         let board_object = $('<li>', {
             'text': list_boards[board]['name'],
@@ -14,10 +15,10 @@ export function drawHomepage(list_boards) {
         });
 
         board_object.css("background", list_boards[board]['bg_color'])
-
         board_object.attr({
             "data-board-id": list_boards[board]['id'],
-            "data-board-name": list_boards[board]['name']
+            "data-board-name": list_boards[board]['name'],
+            "data-board-bg-color": list_boards[board]['bg_color'],
         });
         board_object.on('click', controlModule.openBoard);
 
@@ -30,24 +31,17 @@ export function drawHomepage(list_boards) {
 export function draw(board_objects) {
     $('.table__list-columns').empty();
 
-    let board_columns = board_objects['board_columns'];
-    let board_cards = board_objects['board_cards'];
-    let board_bg_color = board_objects['board_bg_color'];
+    if (board_objects) {
+        for (let column in board_objects) {
+            createColumn(board_objects[column]);
+            let column_cards = board_objects[column].cards;
 
-    if (board_columns) {
-        for (let column in board_columns) {
-            createColumn(board_columns[column]);
-        }
-        if (board_cards) {
-            for (let card in board_cards) {
-                createCard(board_cards[card])
+            if (column_cards) {
+                for (let card in column_cards) {
+                    createCard(column_cards[card])
+                }
             }
         }
-    }
-    if (board_bg_color) {
-        $('.table').css('background-color', board_bg_color)
-    } else {
-        $('.table').css('background-color', 'cadetblue')
     }
 }
 
@@ -107,7 +101,8 @@ function createCard(card_object) {
         "data-object-name": card_object.name,
         "data-object-type": "card"
     });
-    $(`.column[data-column-id="${card_object.column}"]`).find('.column__list-cards').append(newCard);
+    $(`.column[data-column-id="${card_object.column_id}"]`).find(
+        '.column__list-cards').append(newCard);
 }
 
 
@@ -119,9 +114,15 @@ export function drawComments(card_comments) {
         comments_block.prepend($('<li>', {
             'text': card_comments[comment].text,
             'class': 'comments-block__comment'
-        }));
+        }).append($('<button>', {
+            'text': 'X',
+            'class': 'comments-block__comment-delete'
+        })));
 
-        comments_block.attr({
+        comments_block.find('.comments-block__comment-delete').on(
+            'click', controlModule.removeComment);
+
+        comments_block.find('.comments-block__comment').attr({
             "data-comment-id": card_comments[comment].id
         });
     }
